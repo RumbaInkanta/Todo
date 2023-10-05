@@ -1,0 +1,10 @@
+Task
+    id
+    dueDate
+    createdDate
+    text
+    checked
+
+Tasklist
+    list<Task>
+
