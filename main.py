@@ -1,5 +1,5 @@
 from datetime import date
-from model import *
+from model import Task, TaskList
 
 if __name__ == "__main__":
     taskList = TaskList()

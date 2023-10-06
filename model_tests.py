@@ -31,7 +31,7 @@ class TaskListTests(unittest.TestCase):
         self.assertEqual(todays_list.get_count(), 3)
 
         for task in todays_list.get_all_tasks():
-            self.assertRegex(task.text, "Today task \\d")
+            self.assertRegex(task.title, "Today task \\d")
 
     def test_two_done_two_undone_returns_done_tasks(self):
         task_list = TaskList()
@@ -56,8 +56,8 @@ class TaskListTests(unittest.TestCase):
 
         done_tasks = done_list.get_all_tasks()
 
-        self.assertEqual(done_tasks[0].text, "Task 1")
-        self.assertEqual(done_tasks[1].text, "Task 2")
+        self.assertEqual(done_tasks[0].title, "Task 1")
+        self.assertEqual(done_tasks[1].title, "Task 2")
 
     def test_three_tasks_remove_one_two_remain(self):
         today = date.today()
@@ -75,8 +75,8 @@ class TaskListTests(unittest.TestCase):
 
         tasks = task_list.get_all_tasks()
 
-        self.assertEqual(tasks[0].text, "Task 1")
-        self.assertEqual(tasks[1].text, "Task 3")
+        self.assertEqual(tasks[0].title, "Task 1")
+        self.assertEqual(tasks[1].title, "Task 3")
 
     def test_remove_multiple_times(self):
         today = date.today()

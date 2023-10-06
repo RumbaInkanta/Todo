@@ -2,25 +2,36 @@ from datetime import date
 import uuid
 
 class Task:
-    def __init__(self, text: str, due_date: date):
-        self.text = text
+    def __init__(self, title: str, due_date: date, description =''):
+        self.title = title
         self.checked = False
         self.due_date = due_date
+        self.description = description
         self.id = uuid.uuid4()
 
+    def __repr__(self) -> str:
+        output = self.title
+
+        if self.checked:
+            output = "[DONE] " + output
+
+        return output
+    
     def check(self):
         self.checked = True
 
     def uncheck(self):
         self.checked = False
 
-    def __repr__(self) -> str:
-        output = self.text
+    def change_description(self, description: str):
+        self.description = description
+    
+    def change_title(self, title: str):
+        self.title = title
 
-        if self.checked:
-            output = "[DONE] " + output
+    def change_due_date(self, due_date: date):
+        self.due_date = due_date
 
-        return output
 
 class TaskList:
     def __init__(self, tasks = None):
@@ -64,6 +75,10 @@ class TaskList:
     def get_on_date(self, on_date: date):
         tasks = filter(lambda x: x.due_date == on_date, self.tasks)
         return TaskList(list(tasks))
+    
+    #def get_date_delta(self, date1: date, date2: date):
+     #   tasks = self.tasks.sort()
+     #   return TaskList(list(tasks))
 
     def get_count(self) -> int:
         return len(self.tasks)

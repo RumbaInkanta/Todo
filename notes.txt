@@ -2,7 +2,8 @@ Task
     id
     dueDate
     createdDate
-    text
+    text title
+    description
     checked
 
 Tasklist
