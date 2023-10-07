@@ -1,5 +1,6 @@
 from datetime import date
 import uuid
+from utils import *
 
 class Task:
     def __init__(self, title: str, due_date: date, description =''):
@@ -8,6 +9,7 @@ class Task:
         self.due_date = due_date
         self.description = description
         self.id = uuid.uuid4()
+        self._created_date = date.today()
 
     def __repr__(self) -> str:
         output = self.title
@@ -16,6 +18,10 @@ class Task:
             output = "[DONE] " + output
 
         return output
+    
+    @property
+    def created_date(self):
+        return self._created_date
     
     def check(self):
         self.checked = True
@@ -31,6 +37,19 @@ class Task:
 
     def change_due_date(self, due_date: date):
         self.due_date = due_date
+
+    def get_as_csv(self):
+        return [ self.title, self.checked, self.due_date, self.description, self.id, self._created_date ]
+
+    @staticmethod
+    def create_from_csv(collection):
+        task = Task(title=collection[0], due_date=date.fromisoformat(collection[2]), description=collection[3])
+        task.checked = str2bool(collection[1])
+        task.id = uuid.UUID(collection[4])
+        task._created_date = date.fromisoformat(collection[5])
+        return task
+
+
 
 
 class TaskList:
