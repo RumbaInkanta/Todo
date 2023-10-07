@@ -76,10 +76,11 @@ class TaskList:
         tasks = filter(lambda x: x.due_date == on_date, self.tasks)
         return TaskList(list(tasks))
     
-    #def get_date_delta(self, date1: date, date2: date):
-     #   tasks = self.tasks.sort()
-     #   return TaskList(list(tasks))
-
+    def get_sort_date(self):
+        tasks = self.tasks.copy()
+        tasks.sort(key = lambda task: task.due_date)
+        return TaskList(tasks)
+    
     def get_count(self) -> int:
         return len(self.tasks)
 

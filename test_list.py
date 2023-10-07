@@ -90,7 +90,28 @@ class TaskListTests(unittest.TestCase):
         self.assertFalse(task_list.remove(task2.id))
 
         self.assertEqual(task_list.get_count(), 2)
+    
+    def test_sorting_tasks(self):
+        today = date.today()
+        yesterday = today - timedelta(days=1)
+        tomorrow = today + timedelta(days=1)
+        task1 = Task("Task 1", today)
+        task2 = Task("Task 2", yesterday)
+        task3 = Task("Task 3", tomorrow)
+        task4 = Task("Task 4", tomorrow)
+        task5 = Task("Task 5", yesterday)
+        task6 = Task("Task 6", today)
 
+        task_list = TaskList([task1, task2, task3, task4, task5, task6])
+
+        tasks = task_list.get_sort_date().get_all_tasks()
+
+        self.assertEqual(tasks[0].title, "Task 2")
+        self.assertEqual(tasks[1].title, "Task 5")
+        self.assertEqual(tasks[2].title, "Task 1")
+        self.assertEqual(tasks[3].title, "Task 6")
+        self.assertEqual(tasks[4].title, "Task 3")
+        self.assertEqual(tasks[5].title, "Task 4")
 
 if __name__ == "__main__":
     unittest.main()
