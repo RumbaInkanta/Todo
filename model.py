@@ -105,3 +105,35 @@ class TaskList:
 
     def get_all_tasks(self):
         return self.tasks.copy()
+    
+
+
+class Project:
+    def __init__(self, title_project: str):
+        self.title_project = title_project
+    
+    def change_title_project(self, title_project: str):
+        self.title_project = title_project
+
+
+
+class ProjectList:
+    def __init__(self, projects = None) -> None:
+        if projects is None:
+            self.projects = []
+        else:
+            self.projects = projects
+    
+    def __repr__(self) -> str:
+        return '\n'.join(repr(project) for project in self.projects)
+    
+    # как - то нужно связать проект и задачу
+
+    def add(self, project):
+        self.projects.append(project)
+
+    def get_count_projects(self) -> int:
+        return len(self.projects)
+    
+    def get_all_projects(self):
+        return self.projects.copy()

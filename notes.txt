@@ -2,9 +2,20 @@ Task
     id
     dueDate
     createdDate
-    text title
+    title
     description
     checked
 
 Tasklist
     list<Task>
+
+
+
+Что можно сделать:
+
+	периодичность выполнения задачи. например каждые 3 месяца
+	проекты
+	пользователи
+	роли пользователей и права внутри проекта
+    напоминания
+	
