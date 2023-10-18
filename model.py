@@ -72,6 +72,10 @@ class TaskList:
     def add(self, task):
         self.tasks.append(task)
 
+    def add_task(self, title: str, due: date):
+        task = Task(title, due)
+        self.add(task)
+
     def remove(self, id: uuid) -> bool:
         index = self._find_index(id)
         if (index < 0):
@@ -105,35 +109,24 @@ class TaskList:
 
     def get_all_tasks(self):
         return self.tasks.copy()
-    
-
 
 class Project:
-    def __init__(self, title_project: str):
-        self.title_project = title_project
-    
-    def change_title_project(self, title_project: str):
-        self.title_project = title_project
+    def __init__(self, project_title: str):
+        self._project_title = project_title
+        self._task_list = TaskList()
 
+    # project_title
 
+    @property
+    def project_title(self) -> str:
+        return self._project_title
 
-class ProjectList:
-    def __init__(self, projects = None) -> None:
-        if projects is None:
-            self.projects = []
-        else:
-            self.projects = projects
-    
-    def __repr__(self) -> str:
-        return '\n'.join(repr(project) for project in self.projects)
-    
-    # как - то нужно связать проект и задачу
+    @project_title.setter
+    def project_title(self, value: str):
+        self._project_title = value
 
-    def add(self, project):
-        self.projects.append(project)
+    # task_list
 
-    def get_count_projects(self) -> int:
-        return len(self.projects)
-    
-    def get_all_projects(self):
-        return self.projects.copy()
+    @property
+    def task_list(self) -> TaskList:
+        return self._task_list
