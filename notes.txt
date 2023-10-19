@@ -9,6 +9,10 @@ Task
 Tasklist
     list<Task>
 
+Project
+    project_title
+    Tasklist
+
 
 
 Что можно сделать:

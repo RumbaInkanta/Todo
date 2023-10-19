@@ -1,16 +1,14 @@
-from datetime import date, timedelta
 import unittest
 import os
 from model import Task, TaskList
 from task_writer import TaskWriter
 from task_reader import TaskReader
+from datetime import date, timedelta
+
 
 class StorageTests(unittest.TestCase):
     def test_write_read_to_csv(self):
         file_path = "data.csv"
-
-        if os.path.exists(file_path):
-            os.remove(file_path)
 
         today = date.today()
         tomorrow = today + timedelta(days=1)
