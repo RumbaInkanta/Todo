@@ -6,6 +6,7 @@ from task_reader import TaskReader
 from kivymd.app import MDApp
 from kivymd.uix.list import OneLineListItem, TwoLineListItem
 
+
 class TodoApp(MDApp):
 
     def on_start(self):
