@@ -5,6 +5,7 @@ from task_writer import TaskWriter
 from task_reader import TaskReader
 from kivymd.app import MDApp
 from kivymd.uix.list import OneLineListItem, TwoLineListItem
+from kivymd.uix.selectioncontrol import MDCheckbox
 
 
 class TodoApp(MDApp):
@@ -31,7 +32,7 @@ class TodoApp(MDApp):
 
         for csv in csv_files:
             project_title, _ = os.path.splitext(csv)
-            reader = TaskReader(csv)
+            reader = TaskReader(os.path.join(current_directory, csv))
             task_list = reader.read_list()
             project = Project(project_title, task_list=task_list)
             projects.append(project)
@@ -40,7 +41,7 @@ class TodoApp(MDApp):
         
 
     def on_new_task(self):
-        str = []
+
         str = self.root.ids.new_task_title.text.splitlines()
         txt = str[0]
         
@@ -52,11 +53,13 @@ class TodoApp(MDApp):
         self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
         self._selected_project.render_tasks()
         self._write_project_to_file(self._selected_project.project)
+        self.root.ids.new_task_title.text = ''
     
     def on_new_project(self):
         proj = Project(project_title=self.root.ids.new_project_title.text)
         self.projects.append(proj)
         self.root.ids.projects.add_widget(ProjectListItem(proj, app=self, text=proj.project_title, on_release=lambda x: x.on_click()))
+        self.root.ids.new_project_title.text = ''
 
     def _write_project_to_file(self, project: Project) -> None:
         writer = TaskWriter(project.project_title + ".csv")
@@ -73,6 +76,8 @@ class ProjectListItem(OneLineListItem):
     def on_click(self):
         self._set_current_project()
         self.render_tasks()
+        self._app.root.ids.new_task_title.disabled = False
+        self._app.root.ids.new_task_button.disabled = False
 
     def _set_current_project(self):
         self._app._selected_project = self

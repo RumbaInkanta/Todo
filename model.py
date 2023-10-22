@@ -111,9 +111,13 @@ class TaskList:
         return self.tasks.copy()
 
 class Project:
-    def __init__(self, project_title: str, task_list: TaskList = TaskList()):
+    def __init__(self, project_title: str, task_list: TaskList = None):
         self._project_title = project_title
-        self._task_list = task_list
+        
+        if task_list is None:
+            self._task_list = TaskList()
+        else:
+            self._task_list = task_list
 
     # project_title
 
