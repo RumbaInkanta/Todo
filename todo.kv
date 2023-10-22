@@ -21,12 +21,13 @@ MDBoxLayout:
             MDTextField:
                 id: new_task_title
                 hint_text: "Добавить задачу"
-                multiline: False
+                multiline: True
                 icon_left: "checkbox-marked-circle-plus-outline"
                 on_text_validate: app.on_new_task()
             MDIconButton:
                 icon: "plus"
                 pos_hint: {"center_x": .5, "center_y": .5}
+                on_press: app.on_new_task()
         MDBoxLayout:
             size_hint: 1, .9
             MDScrollView:

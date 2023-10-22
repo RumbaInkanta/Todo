@@ -72,8 +72,8 @@ class TaskList:
     def add(self, task):
         self.tasks.append(task)
 
-    def add_task(self, title: str, due: date):
-        task = Task(title, due)
+    def add_task(self, title: str, due: date, description: str = ""):
+        task = Task(title, due, description)
         self.add(task)
 
     def remove(self, id: uuid) -> bool:

@@ -37,9 +37,19 @@ class TodoApp(MDApp):
             projects.append(project)
 
         return projects
+        
 
     def on_new_task(self):
-        self._selected_project.project.task_list.add_task(self.root.ids.new_task_title.text, due=date.today())
+        str = []
+        str = self.root.ids.new_task_title.text.splitlines()
+        txt = str[0]
+        
+        if len(str) > 1:
+            descr = " ".join(str[1:])
+        else:
+            descr = ""
+        
+        self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
         self._selected_project.render_tasks()
         self._write_project_to_file(self._selected_project.project)
     
