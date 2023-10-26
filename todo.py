@@ -1,4 +1,5 @@
 import os
+import argparse
 from datetime import date
 from model import Task, TaskList, Project
 from task_writer import TaskWriter
@@ -12,27 +13,27 @@ class TodoApp(MDApp):
 
     def on_start(self):
 
-        self.projects = self._read_all_projects()
+        self.projects = self._read_all_projects(args.csv_folder)
 
         for p in self.projects:
             self.root.ids.projects.add_widget(ProjectListItem(project=p, app=self, text=p.project_title, on_release=lambda x: x.on_click()))
 
-        # for p in self.projects:
-        #     today_list = p.task_list.get_today()
-        #     print(f"Проект {p.project_title}. {today_list.get_count()} задач на сегодня:")
 
-        #     for t in today_list.get_all_tasks():
-        #         print(f"\t{t.title}")
-
-    def _read_all_projects(self) -> []:
+    def _read_all_projects(self, csv_folder) -> []:
         current_directory = os.path.dirname(os.path.abspath(__file__))
-        csv_files = [f for f in os.listdir(current_directory) if f.endswith('.csv')]
+
+        if csv_folder is None:
+            direct = current_directory
+        else:
+            direct = csv_folder
+
+        csv_files = [f for f in os.listdir(direct) if f.endswith('.csv')]
 
         projects = []
 
         for csv in csv_files:
             project_title, _ = os.path.splitext(csv)
-            reader = TaskReader(os.path.join(current_directory, csv))
+            reader = TaskReader(os.path.join(direct, csv))
             task_list = reader.read_list()
             project = Project(project_title, task_list=task_list)
             projects.append(project)
@@ -90,4 +91,8 @@ class ProjectListItem(OneLineListItem):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Скрипт для обработки CSV файлов")
+    parser.add_argument("csv_folder", nargs="?", default=".", help="Папка с CSV файлами")
+    args = parser.parse_args()
+        
     TodoApp().run()
