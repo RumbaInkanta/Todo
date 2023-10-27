@@ -1,5 +1,5 @@
 import os
-import argparse
+import sys
 from datetime import date
 from model import Task, TaskList, Project
 from task_writer import TaskWriter
@@ -12,28 +12,24 @@ from kivymd.uix.selectioncontrol import MDCheckbox
 class TodoApp(MDApp):
 
     def on_start(self):
-
-        self.projects = self._read_all_projects(args.csv_folder)
+        
+        self.projects = self._read_all_projects()
 
         for p in self.projects:
             self.root.ids.projects.add_widget(ProjectListItem(project=p, app=self, text=p.project_title, on_release=lambda x: x.on_click()))
 
+    def path_parse(self):
+        return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.abspath(__file__))
 
-    def _read_all_projects(self, csv_folder) -> []:
-        current_directory = os.path.dirname(os.path.abspath(__file__))
-
-        if csv_folder is None:
-            direct = current_directory
-        else:
-            direct = csv_folder
-
-        csv_files = [f for f in os.listdir(direct) if f.endswith('.csv')]
+    def _read_all_projects(self) -> []:
+        
+        csv_files = [f for f in os.listdir(self.path_parse()) if f.endswith('.csv')]
 
         projects = []
 
         for csv in csv_files:
             project_title, _ = os.path.splitext(csv)
-            reader = TaskReader(os.path.join(direct, csv))
+            reader = TaskReader(os.path.join(self.path_parse(), csv))
             task_list = reader.read_list()
             project = Project(project_title, task_list=task_list)
             projects.append(project)
@@ -57,13 +53,20 @@ class TodoApp(MDApp):
         self.root.ids.new_task_title.text = ''
     
     def on_new_project(self):
-        proj = Project(project_title=self.root.ids.new_project_title.text)
-        self.projects.append(proj)
-        self.root.ids.projects.add_widget(ProjectListItem(proj, app=self, text=proj.project_title, on_release=lambda x: x.on_click()))
-        self.root.ids.new_project_title.text = ''
+
+        project_title=self.root.ids.new_project_title.text
+        
+        if project_title:
+            proj = Project(project_title)
+            self.projects.append(proj)
+            self.root.ids.projects.add_widget(ProjectListItem(proj, app=self, text=proj.project_title, on_release=lambda x: x.on_click()))
+            self.root.ids.new_project_title.text = ''
+        else:
+            self.root.ids.new_project_title.hint_text = 'Введите название'
+            
 
     def _write_project_to_file(self, project: Project) -> None:
-        writer = TaskWriter(project.project_title + ".csv")
+        writer = TaskWriter(os.path.join(self.path_parse(), project.project_title + ".csv"))
         writer.write_list(project.task_list)
 
 
@@ -91,8 +94,5 @@ class ProjectListItem(OneLineListItem):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Скрипт для обработки CSV файлов")
-    parser.add_argument("csv_folder", nargs="?", default=".", help="Папка с CSV файлами")
-    args = parser.parse_args()
         
     TodoApp().run()

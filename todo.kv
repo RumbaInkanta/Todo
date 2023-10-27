@@ -12,7 +12,12 @@ MDBoxLayout:
                 icon_left: "folder"
                 hint_text: "Добавить проект"
                 on_text_validate: app.on_new_project()
-
+            MDIconButton:
+                id: new_project_button
+                icon: "plus"
+                pos_hint: {"center_x": .5, "center_y": .5}
+                on_press: app.on_new_project()
+                disabled: False
         MDBoxLayout:
             size_hint: .65, 1
             padding: [5, 5, 5, 0]
