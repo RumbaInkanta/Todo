@@ -7,16 +7,21 @@ from task_reader import TaskReader
 from kivymd.app import MDApp
 from kivymd.uix.list import OneLineListItem, TwoLineListItem
 from kivymd.uix.selectioncontrol import MDCheckbox
+from kivy.lang import Builder
 
 
 class TodoApp(MDApp):
 
     def on_start(self):
-        
         self.projects = self._read_all_projects()
 
         for p in self.projects:
             self.root.ids.projects.add_widget(ProjectListItem(project=p, app=self, text=p.project_title, on_release=lambda x: x.on_click()))
+
+    def build(self):
+        self.theme_cls.theme_style = "Dark"
+        self.theme_cls.primary_palette = "Green"
+        return Builder.load_file('todo.kv')
 
     def path_parse(self):
         return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.abspath(__file__))
@@ -85,6 +90,7 @@ class ProjectListItem(OneLineListItem):
 
     def _set_current_project(self):
         self._app._selected_project = self
+        self._app._selected_project.text_color = 'FFFFFF'
 
     def render_tasks(self):
         self._task_list_container.clear_widgets()
