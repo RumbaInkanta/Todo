@@ -6,6 +6,7 @@ from task_writer import TaskWriter
 from task_reader import TaskReader
 from kivymd.app import MDApp
 from kivymd.uix.list import OneLineListItem, TwoLineListItem
+from kivymd.uix.boxlayout import BoxLayout
 from kivy.lang import Builder
 from kivymd.uix.label import MDLabel
 from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
@@ -103,15 +104,17 @@ class ProjectListItem(OneLineListItem):
         for t in self.project.task_list.get_all_tasks():
             self._task_list_container.add_widget(TaskListItem(task=t))
 
-class TaskListItem(TwoLineListItem):
+class TaskListItem(BoxLayout):
 
     def __init__(self, task: Task, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._task = task
-        self.text = task.title
-        self.secondary_text = task.description
-        w = TaskCheckbox(task)
-        self.add_widget(w) # в документации add widget нет
+        self.orientation = 'horizontal'
+        self.size_hint_y = None
+        self.height = '72dp'
+        
+        self.add_widget(TaskCheckbox(task=task, width='48dp', size_hint=(.15,1)))
+        self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description))
 
 class TaskCheckbox(IRightBodyTouch, MDCheckbox):
 
