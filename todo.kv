@@ -1,10 +1,10 @@
 #:kivy 2.2.1
+<TaskListItem>:
 
-    
+    TaskCheckbox:
+
 MDBoxLayout:
     orientation: 'vertical'
-
-    
     MDBoxLayout:
         size_hint: 1, .1        
         MDBoxLayout:
@@ -39,7 +39,7 @@ MDBoxLayout:
                     on_press: app.on_new_task()
                     disabled: True
     MDBoxLayout:
-        size_hint: 1, .9
+        size_hint: 1, .8
         MDBoxLayout:
             size_hint: .35, 1
             MDScrollView:
@@ -50,4 +50,13 @@ MDBoxLayout:
             MDScrollView:
                 MDList:
                     id: tasks
-                    
+
+
+    MDBoxLayout:
+        size_hint: 1, .1
+        MDLabel:
+            id: datetime_label
+            padding: 10
+            size_hint_y: None
+            height: 50
+            theme_text_color: "Secondary"    

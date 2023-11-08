@@ -6,22 +6,28 @@ from task_writer import TaskWriter
 from task_reader import TaskReader
 from kivymd.app import MDApp
 from kivymd.uix.list import OneLineListItem, TwoLineListItem
-from kivymd.uix.selectioncontrol import MDCheckbox
 from kivy.lang import Builder
+from kivymd.uix.label import MDLabel
+from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
+from kivymd.uix.selectioncontrol import MDCheckbox
 
 
 class TodoApp(MDApp):
 
+    kv_loaded = False
+
     def on_start(self):
+        if not self.kv_loaded:
+            Builder.load_file('todo.kv')
+            self.kv_loaded = True
+
+        self.theme_cls.theme_style = "Dark"
+        self.theme_cls.primary_palette = "LightGreen"
         self.projects = self._read_all_projects()
+        self.root.ids.datetime_label.text = f'Сегодня: {date.today().strftime("%d-%m-%Y")}'
 
         for p in self.projects:
             self.root.ids.projects.add_widget(ProjectListItem(project=p, app=self, text=p.project_title, on_release=lambda x: x.on_click()))
-
-    def build(self):
-        self.theme_cls.theme_style = "Dark"
-        self.theme_cls.primary_palette = "Green"
-        return Builder.load_file('todo.kv')
 
     def path_parse(self):
         return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.abspath(__file__))
@@ -90,14 +96,33 @@ class ProjectListItem(OneLineListItem):
 
     def _set_current_project(self):
         self._app._selected_project = self
-        self._app._selected_project.text_color = 'FFFFFF'
 
     def render_tasks(self):
         self._task_list_container.clear_widgets()
         
         for t in self.project.task_list.get_all_tasks():
-            self._task_list_container.add_widget(TwoLineListItem(text=t.title, secondary_text=t.description))
+            self._task_list_container.add_widget(TaskListItem(task=t))
 
+class TaskListItem(TwoLineListItem):
+
+    def __init__(self, task: Task, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._task = task
+        self.text = task.title
+        self.secondary_text = task.description
+        w = TaskCheckbox(task)
+        self.add_widget(w) # в документации add widget нет
+
+class TaskCheckbox(IRightBodyTouch, MDCheckbox):
+
+    def __init__(self, task: Task, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._task = task
+        self.active = task.checked
+
+    def on_active(self, *args) -> None:
+        super().on_active(*args)
+        self._task.checked = self.active
 
 if __name__ == '__main__':
         
