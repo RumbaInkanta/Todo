@@ -30,18 +30,15 @@ class TodoApp(MDApp):
         for p in self.projects:
             self.root.ids.projects.add_widget(ProjectListItem(project=p, app=self, text=p.project_title, on_release=lambda x: x.on_click()))
 
-    def path_parse(self):
-        return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.abspath(__file__))
-
     def _read_all_projects(self) -> []:
         
-        csv_files = [f for f in os.listdir(self.path_parse()) if f.endswith('.csv')]
+        csv_files = [f for f in os.listdir(path_parse()) if f.endswith('.csv')]
 
         projects = []
 
         for csv in csv_files:
             project_title, _ = os.path.splitext(csv)
-            reader = TaskReader(os.path.join(self.path_parse(), csv))
+            reader = TaskReader(os.path.join(path_parse(), csv))
             task_list = reader.read_list()
             project = Project(project_title, task_list=task_list)
             projects.append(project)
@@ -78,8 +75,14 @@ class TodoApp(MDApp):
             
 
     def _write_project_to_file(self, project: Project) -> None:
-        writer = TaskWriter(os.path.join(self.path_parse(), project.project_title + ".csv"))
+        writer = create_writer(project)
         writer.write_list(project.task_list)
+
+def path_parse():
+    return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.abspath(__file__))
+
+def create_writer(project: Project) -> TaskWriter:
+    return TaskWriter(os.path.join(path_parse(), project.project_title + ".csv"))
 
 
 class ProjectListItem(OneLineListItem):
@@ -100,32 +103,40 @@ class ProjectListItem(OneLineListItem):
 
     def render_tasks(self):
         self._task_list_container.clear_widgets()
+
+        writer = create_writer(self.project)
         
         for t in self.project.task_list.get_all_tasks():
-            self._task_list_container.add_widget(TaskListItem(task=t))
+            self._task_list_container.add_widget(TaskListItem(task=t, on_change=lambda: writer.write_list(self.project.task_list)))
 
 class TaskListItem(BoxLayout):
 
-    def __init__(self, task: Task, *args, **kwargs):
+    def __init__(self, task: Task, on_change=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._task = task
         self.orientation = 'horizontal'
         self.size_hint_y = None
         self.height = '72dp'
         
-        self.add_widget(TaskCheckbox(task=task, width='48dp', size_hint=(.15,1)))
+        self.add_widget(TaskCheckbox(task=task, on_change=on_change, width='48dp', size_hint=(.15,1)))
         self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description))
 
 class TaskCheckbox(IRightBodyTouch, MDCheckbox):
 
-    def __init__(self, task: Task, *args, **kwargs):
+    _on_change = None
+    
+    def __init__(self, task: Task, on_change=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._task = task
         self.active = task.checked
+        self._on_change = on_change
 
     def on_active(self, *args) -> None:
         super().on_active(*args)
         self._task.checked = self.active
+
+        if self._on_change:
+            self._on_change()
 
 if __name__ == '__main__':
         
