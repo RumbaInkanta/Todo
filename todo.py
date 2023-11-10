@@ -49,17 +49,20 @@ class TodoApp(MDApp):
     def on_new_task(self):
 
         str = self.root.ids.new_task_title.text.splitlines()
-        txt = str[0]
-        
-        if len(str) > 1:
-            descr = " ".join(str[1:])
+        if str:
+            txt = str[0]
+            
+            if len(str) > 1:
+                descr = " ".join(str[1:])
+            else:
+                descr = ""
+            
+            self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
+            self._selected_project.render_tasks()
+            self._write_project_to_file(self._selected_project.project)
+            self.root.ids.new_task_title.text = ''
         else:
-            descr = ""
-        
-        self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
-        self._selected_project.render_tasks()
-        self._write_project_to_file(self._selected_project.project)
-        self.root.ids.new_task_title.text = ''
+            self.root.ids.new_task_title.text = 'Введите название'
     
     def on_new_project(self):
 
@@ -114,9 +117,6 @@ class TaskListItem(BoxLayout):
     def __init__(self, task: Task, on_change=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._task = task
-        self.orientation = 'horizontal'
-        self.size_hint_y = None
-        self.height = '72dp'
         
         self.add_widget(TaskCheckbox(task=task, on_change=on_change, width='48dp', size_hint=(.15,1)))
         self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description))
