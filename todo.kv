@@ -3,60 +3,75 @@
     orientation: 'horizontal'
     size_hint_y: None
     height: '72dp'
-MDBoxLayout:
-    orientation: 'vertical'
+ScreenManager:
+    MainScreen:
+        name: 'main'
+    TaskEditScreen:
+        name: 'task_edit'
+
+<MainScreen>:
     MDBoxLayout:
-        size_hint: 1, .1        
+        orientation: 'vertical'
         MDBoxLayout:
-            size_hint: .35, 1
-            padding: [10, 5, 5, 0]
-            MDTextField:
-                id: new_project_title
-                multiline: False
-                icon_left: "folder"
-                hint_text: "Добавить проект"
-                on_text_validate: app.on_new_project()
-            MDIconButton:
-                id: new_project_button
-                icon: "plus"
-                pos_hint: {"center_x": .5, "center_y": .5}
-                on_press: app.on_new_project()
-                disabled: False
-        MDBoxLayout:
-            size_hint: .65, 1
-            padding: [5, 5, 5, 0]
+            size_hint: 1, .1        
             MDBoxLayout:
+                size_hint: .35, 1
+                padding: [10, 5, 5, 0]
                 MDTextField:
-                    id: new_task_title
-                    hint_text: "Добавить задачу"
-                    multiline: True
-                    icon_left: "checkbox-marked-circle-plus-outline"
-                    disabled: True
+                    id: new_project_title
+                    multiline: False
+                    icon_left: "folder"
+                    hint_text: "Добавить проект"
+                    on_text_validate: app.on_new_project()
                 MDIconButton:
-                    id: new_task_button
+                    id: new_project_button
                     icon: "plus"
                     pos_hint: {"center_x": .5, "center_y": .5}
-                    on_press: app.on_new_task()
-                    disabled: True
-    MDBoxLayout:
-        size_hint: 1, .8
+                    on_press: app.on_new_project()
+                    disabled: False
+            MDBoxLayout:
+                size_hint: .65, 1
+                padding: [5, 5, 5, 0]
+                MDBoxLayout:
+                    MDTextField:
+                        id: new_task_title
+                        hint_text: "Добавить задачу"
+                        multiline: True
+                        icon_left: "checkbox-marked-circle-plus-outline"
+                        disabled: True
+                    MDIconButton:
+                        id: new_task_button
+                        icon: "plus"
+                        pos_hint: {"center_x": .5, "center_y": .5}
+                        on_press: app.on_new_task()
+                        disabled: True
         MDBoxLayout:
-            size_hint: .35, 1
-            MDScrollView:
-                MDList:
-                    id: projects
-        MDBoxLayout:
-            size_hint: .65, 1
-            MDScrollView:
-                MDList:
-                    id: tasks
+            size_hint: 1, .8
+            MDBoxLayout:
+                size_hint: .35, 1
+                MDScrollView:
+                    MDList:
+                        id: projects
+            MDBoxLayout:
+                size_hint: .65, 1
+                MDScrollView:
+                    MDList:
+                        id: tasks
+                        
 
 
-    MDBoxLayout:
-        size_hint: 1, .1
-        MDLabel:
-            id: datetime_label
-            padding: 10
-            size_hint_y: None
-            height: 50
-            theme_text_color: "Secondary"    
+        MDBoxLayout:
+            size_hint: 1, .1
+            MDLabel:
+                id: datetime_label
+                padding: 10
+                size_hint_y: None
+                height: 50
+                theme_text_color: "Secondary"
+
+<TaskEditScreen>:
+    BoxLayout:
+        MDIconButton:
+            height: 70
+            on_press: root.cancel_click()
+            icon: 'abort'

@@ -22,4 +22,15 @@ Project
 	пользователи
 	роли пользователей и права внутри проекта
     напоминания
-	
+
+
+Infrastructure
+
+1. Storage (csv -> sqlite)
+2. Refactoring
+
+Features
+
+1. Edit/Remove tasks
+2. Recurring tasks (add schedule)
+3. Add dynamic lists (today, soon, etc)
