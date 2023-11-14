@@ -39,9 +39,9 @@ class MainScreen(Screen):
             txt = str[0]
             
             if len(str) > 1:
-                descr = " ".join(str[1:])
+                descr = ' '.join(str[1:])
             else:
-                descr = ""
+                descr = ''
             
             self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
             self._selected_project.render_tasks()

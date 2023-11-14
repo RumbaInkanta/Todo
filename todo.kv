@@ -57,9 +57,6 @@ ScreenManager:
                 MDScrollView:
                     MDList:
                         id: tasks
-                        
-
-
         MDBoxLayout:
             size_hint: 1, .1
             MDLabel:
@@ -70,8 +67,54 @@ ScreenManager:
                 theme_text_color: 'Secondary'
 
 <TaskEditScreen>:
-    BoxLayout:
-        MDIconButton:
-            height: 70
-            on_press: root.cancel_click()
-            icon: 'abort'
+    MDBoxLayout:
+        orientation: 'vertical'
+        MDBoxLayout: 
+            padding: 10
+            size_hint: 1, .1        
+            MDRoundFlatIconButton:
+                icon: 'arrow-left'
+                pos_hint: {'x': 0, 'top': 1}
+                text: 'Назад'
+                on_press: root.cancel_click()
+            MDLabel:
+                halign: "center"
+                text: "Изменить задачу"
+        MDBoxLayout:
+            padding: 30
+            orientation: 'vertical'
+            size_hint: 1, .9
+            MDTextField:
+                hint_text: "Title task"
+                multiline: False
+                size_hint: 1, .2
+            MDTextField:
+                hint_text: "Title description"
+                multiline: True
+                size_hint: 1, .4
+            MDBoxLayout:
+                size_hint: 1, .4
+                MDTextField:
+                    hint_text: 'Due_date'
+                    multiline: False
+                #MDDatePicker вставить
+                
+                MDLabel:
+                    halign: 'center'
+                    text: "Дата создания задачи"
+            MDBoxLayout:
+                size_hint: 1, .2
+                MDRoundFlatIconButton:
+                    size_hint: .4, 1
+                    icon: 'delete'
+                    text: "Удалить задачу"
+                    on_press: root.cancel_click()
+                MDBoxLayout:
+                    size_hint: .2, 1                    
+                MDRoundFlatIconButton:
+                    size_hint: .4, 1
+                    icon: 'check-bold'
+                    text: 'Изменить задачу'
+                    on_press: root.cancel_click()
+
+
