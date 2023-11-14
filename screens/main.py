@@ -18,23 +18,23 @@ def path_parse():
     return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def create_writer(project: md.Project) -> TaskWriter:
-    return TaskWriter(os.path.join(path_parse(), project.project_title + ".csv"))
+    return TaskWriter(os.path.join(path_parse(), project.project_title + '.csv'))
 
 class MainScreen(Screen):
 
     def fill_data(self):
         self.projects = self._read_all_projects()
-        self.ids.datetime_label.text = f'Сегодня: {date.today().strftime("%d-%m-%Y")}'
+        self.ids.datetime_label.text = f"Сегодня: {date.today().strftime('%d-%m-%Y')}"
 
         for p in self.projects:
             self.ids.projects.add_widget(ProjectListItem(project=p, main_screen=self, text=p.project_title, on_release=lambda x: x.on_click()))
 
     def open_edit(self):
-        self.manager.current = "task_edit"
+        self.manager.current = 'task_edit'
 
     def on_new_task(self):
 
-        str = self.root.ids.new_task_title.text.splitlines()
+        str = self.ids.new_task_title.text.splitlines()
         if str:
             txt = str[0]
             
@@ -46,21 +46,21 @@ class MainScreen(Screen):
             self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
             self._selected_project.render_tasks()
             self._write_project_to_file(self._selected_project.project)
-            self.root.ids.new_task_title.text = ''
+            self.ids.new_task_title.text = ''
         else:
-            self.root.ids.new_task_title.text = 'Введите название'
+            self.ids.new_task_title.text = "Введите название"
     
     def on_new_project(self):
 
-        project_title=self.root.ids.new_project_title.text
+        project_title=self.ids.new_project_title.text
         
         if project_title:
             proj = md.Project(project_title)
             self.projects.append(proj)
-            self.root.ids.projects.add_widget(ProjectListItem(proj, app=self, text=proj.project_title, on_release=lambda x: x.on_click()))
-            self.root.ids.new_project_title.text = ''
+            self.ids.projects.add_widget(ProjectListItem(proj, main_screen=self, text=proj.project_title, on_release=lambda x: x.on_click()))
+            self.ids.new_project_title.text = ''
         else:
-            self.root.ids.new_project_title.hint_text = 'Введите название'
+            self.ids.new_project_title.hint_text = "Введите название"
             
 
     def _write_project_to_file(self, project: md.Project) -> None:
@@ -115,7 +115,7 @@ class TaskListItem(BoxLayout):
         
         self.add_widget(TaskCheckbox(task=task, on_change=on_change, width='48dp', size_hint=(.15,1)))
         self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description))
-        self.add_widget(MDIconButton(icon="pencil", on_press=self.switch_to_edit))
+        self.add_widget(MDIconButton(icon='pencil', on_press=self.switch_to_edit))
 
     def switch_to_edit(self, instance):
         self._main_screen.manager.current = 'task_edit'

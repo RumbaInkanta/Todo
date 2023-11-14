@@ -26,10 +26,10 @@ class TodoApp(MDApp):
             Builder.load_file('todo.kv')
             self.kv_loaded = True
 
-        self.theme_cls.theme_style = "Dark"
-        self.theme_cls.primary_palette = "LightGreen"
-
-        self.root.get_screen("main").fill_data()
+        self.theme_cls.theme_style = 'Dark'
+        self.theme_cls.primary_palette = 'LightGreen'
+        self.title = "Река времени"
+        self.root.get_screen('main').fill_data()
 
 
 
