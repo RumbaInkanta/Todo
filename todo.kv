@@ -78,28 +78,32 @@ ScreenManager:
                 text: 'Назад'
                 on_press: root.cancel_click()
             MDLabel:
-                halign: "center"
+                halign: 'center'
                 text: "Изменить задачу"
         MDBoxLayout:
             padding: 30
             orientation: 'vertical'
             size_hint: 1, .9
             MDTextField:
+                id: edit_task_title
                 hint_text: "Title task"
                 multiline: False
                 size_hint: 1, .2
             MDTextField:
+                id: edit_task_description
                 hint_text: "Title description"
                 multiline: True
                 size_hint: 1, .4
             MDBoxLayout:
                 size_hint: 1, .4
                 MDTextField:
+                    id: edit_task_due_date
                     hint_text: 'Due_date'
                     multiline: False
                 #MDDatePicker вставить
                 
                 MDLabel:
+                    id: edit_task_created_date
                     halign: 'center'
                     text: "Дата создания задачи"
             MDBoxLayout:
@@ -108,7 +112,7 @@ ScreenManager:
                     size_hint: .4, 1
                     icon: 'delete'
                     text: "Удалить задачу"
-                    on_press: root.cancel_click()
+                    on_press: root.cancel_click() #модальное окно вставить
                 MDBoxLayout:
                     size_hint: .2, 1                    
                 MDRoundFlatIconButton:
@@ -116,5 +120,3 @@ ScreenManager:
                     icon: 'check-bold'
                     text: 'Изменить задачу'
                     on_press: root.cancel_click()
-
-
