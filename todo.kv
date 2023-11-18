@@ -86,36 +86,40 @@ ScreenManager:
             size_hint: 1, .9
             MDTextField:
                 id: edit_task_title
-                hint_text: "Title task"
+                hint_text: 'Название'
                 multiline: False
                 size_hint: 1, .2
             MDTextField:
                 id: edit_task_description
-                hint_text: "Title description"
+                hint_text: 'Описание'
                 multiline: True
                 size_hint: 1, .4
             MDBoxLayout:
                 size_hint: 1, .4
+                spacing: dp(10)
                 MDTextField:
                     id: edit_task_due_date
-                    hint_text: 'Due_date'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    hint_text: "Дата выполнения"
                     multiline: False
-                #MDDatePicker вставить
-                
-                MDLabel:
-                    id: edit_task_created_date
-                    halign: 'center'
-                    text: "Дата создания задачи"
+                    size_hint_x: None
+                MDRoundFlatIconButton:
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    size_hint_x: None
+                    icon: 'calendar'
+                    text: "Изменить дату"
+                    on_release: root.show_date_picker()
             MDBoxLayout:
                 size_hint: 1, .2
+                padding: 10
                 MDRoundFlatIconButton:
                     size_hint: .4, 1
                     icon: 'delete'
                     text: "Удалить задачу"
-                    on_press: root.cancel_click() #модальное окно вставить
+                    on_release: root.show_confirmation_dialog()
                 MDBoxLayout:
                     size_hint: .2, 1                    
-                MDRoundFlatIconButton:
+                MDFillRoundFlatIconButton:
                     size_hint: .4, 1
                     icon: 'check-bold'
                     text: 'Изменить задачу'

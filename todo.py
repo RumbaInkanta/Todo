@@ -17,6 +17,7 @@ from screens.main import MainScreen
 from screens.task_edit import TaskEditScreen
 
 
+
 class TodoApp(MDApp):
 
     kv_loaded = False

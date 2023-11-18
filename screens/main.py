@@ -119,7 +119,7 @@ class TaskListItem(BoxLayout):
 
     def switch_to_edit(self, instance):
         task_edit_screen = self._main_screen.manager.get_screen('task_edit')
-        task_edit_screen.set_task_values(self._task.title, self._task.description, self._task.due_date, self._task.created_date)
+        task_edit_screen.set_task_values(self._task.title, self._task.description, self._task.due_date)
         self._main_screen.manager.current = 'task_edit'
     
 
