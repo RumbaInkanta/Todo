@@ -50,6 +50,19 @@ class MainScreen(Screen):
         else:
             self.ids.new_task_title.text = "Введите название"
     
+    def on_task_change(self):
+        self._selected_project.render_tasks()
+        self._write_project_to_file(self._selected_project.project)
+
+    def on_task_delete(self, task: md.Task):
+        removed = self._selected_project.project.task_list.remove(task.id)
+
+        if not removed:
+            print(f'Cannot find task {task.id}')
+            return
+
+        self.on_task_change()
+
     def on_new_project(self):
 
         project_title=self.ids.new_project_title.text
@@ -119,7 +132,7 @@ class TaskListItem(BoxLayout):
 
     def switch_to_edit(self, instance):
         task_edit_screen = self._main_screen.manager.get_screen('task_edit')
-        task_edit_screen.set_task_values(self._task.title, self._task.description, self._task.due_date)
+        task_edit_screen.set_task(self._task)
         self._main_screen.manager.current = 'task_edit'
     
 

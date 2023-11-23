@@ -5,6 +5,7 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton, MDFillRoundFlatIconButton
 from screens.main import TaskListItem, MainScreen
 import model as md
+from datetime import date
 
 
 class TaskEditScreen(Screen):
@@ -12,10 +13,11 @@ class TaskEditScreen(Screen):
         super().__init__(*args, **kwargs)
         self.confirmation_dialog = None 
 
-    def set_task_values(self, task_title, task_description, due_date):
-        self.ids.edit_task_title.text = task_title
-        self.ids.edit_task_description.text = task_description
-        self.ids.edit_task_due_date.text = str(due_date)
+    def set_task(self, task: md.Task):
+        self._task = task
+        self.ids.edit_task_title.text = task.title
+        self.ids.edit_task_description.text = task.description
+        self.ids.edit_task_due_date.text = str(task.due_date)
     
     def show_date_picker(self):
         date_dialog = MDDatePicker()
@@ -42,12 +44,25 @@ class TaskEditScreen(Screen):
         self.confirmation_dialog.open()
 
     def confirmation_callback(self):
-        print("Пиши логику е-мае")
-        self.manager.current = 'main'
+        self.get_main_screen().on_task_delete(self._task)
+        self.switch_to_main()
         self.confirmation_dialog.dismiss()
 
     def change_task(self):
-        pass
+        self._task.title = self.ids.edit_task_title.text
+        self._task.description = self.ids.edit_task_description.text
+        self._task.due_date = date.fromisoformat(self.ids.edit_task_due_date.text)
+
+        self.get_main_screen().on_task_change()
+
+        self.switch_to_main()
     
     def cancel_click(self):
+        self.switch_to_main()
+
+    def get_main_screen(self):
+        main_screen = self.manager.get_screen('main')
+        return main_screen
+
+    def switch_to_main(self):
         self.manager.current = 'main'
