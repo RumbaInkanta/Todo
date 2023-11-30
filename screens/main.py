@@ -31,7 +31,7 @@ class MainScreen(Screen):
 
     def fill_data(self):
         self.projects = self._read_all_projects()
-        self.ids.datetime_label.text = f"Сегодня: {date.today().strftime('%d-%m-%Y')}"
+        self.ids.datetime_label.text = f"Сегодня: {date.today().strftime('%d.%m.%Y')}"
 
         for p in self.projects:
             self.ids.projects.add_widget(ProjectListItem(project=p, main_screen=self, text=p.project_title, on_release=lambda x: x.on_click()))
@@ -145,6 +145,7 @@ class TaskListItem(BoxLayout):
         
         self.add_widget(TaskCheckbox(task=task, on_change=on_change, width='48dp', size_hint=(.15,1)))
         self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description))
+        self.add_widget(MDLabel(text=task.due_date.strftime('%d.%m.%Y'), size_hint=(.30,1)))
         self.add_widget(MDIconButton(icon='pencil', on_press=self.switch_to_edit))
 
     def switch_to_edit(self, instance):
