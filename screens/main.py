@@ -8,11 +8,15 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.uix.list import OneLineListItem, TwoLineListItem
 from kivymd.uix.boxlayout import BoxLayout
 from kivy.lang import Builder
+from kivy.core.window import Window
 from kivymd.uix.label import MDLabel
 from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
 from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.uix.button import MDIconButton
+from kivy.clock import Clock
+from kivy.clock import mainthread
 import model as md
+import keyboard
 
 def path_parse():
     return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -21,6 +25,9 @@ def create_writer(project: md.Project) -> TaskWriter:
     return TaskWriter(os.path.join(path_parse(), project.project_title + '.csv'))
 
 class MainScreen(Screen):
+    def __init__(self, **kwargs):
+        super(MainScreen, self).__init__(**kwargs)
+        keyboard.add_hotkey('ctrl+enter', self.on_new_task)
 
     def fill_data(self):
         self.projects = self._read_all_projects()
@@ -31,7 +38,8 @@ class MainScreen(Screen):
 
     def open_edit(self):
         self.manager.current = 'task_edit'
-
+    
+    @mainthread
     def on_new_task(self):
 
         str = self.ids.new_task_title.text.splitlines()
@@ -47,9 +55,18 @@ class MainScreen(Screen):
             self._selected_project.render_tasks()
             self._write_project_to_file(self._selected_project.project)
             self.ids.new_task_title.text = ''
+            self.ids.new_task_title.focus = False
         else:
             self.ids.new_task_title.text = "Введите название"
     
+    def schedule_on_new_task(self, *args):
+        Clock.schedule_once(self.on_new_task, 0)
+
+    def on_key_down(self, window, keycode, scancode, codepoint, modifier):
+        # Проверка, что TextInput активен
+        if self.ids.new_task_title.focus and 'ctrl' in modifier and keycode == 40:  # Код клавиши Enter
+            self.schedule_on_new_task()
+
     def on_task_change(self):
         self._selected_project.render_tasks()
         self._write_project_to_file(self._selected_project.project)
