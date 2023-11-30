@@ -1,5 +1,5 @@
 from datetime import date
-import uuid
+import uuid, itertools
 from utils import *
 
 class Task:
@@ -49,8 +49,13 @@ class Task:
         task._created_date = date.fromisoformat(collection[5])
         return task
 
+def merge_task_lists(task_lists: []):
+    tasks = []
+    
+    for lst in task_lists:
+        tasks.extend(lst.get_all_tasks())
 
-
+    return TaskList(tasks)
 
 class TaskList:
     def __init__(self, tasks = None):

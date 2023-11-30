@@ -1,6 +1,6 @@
 import unittest
 from datetime import date, timedelta
-from model import Task, TaskList
+from model import Task, TaskList, merge_task_lists
 
 class TaskListTests(unittest.TestCase):
     def test_create_tasklist_add_element_contains_elements(self):
@@ -92,6 +92,27 @@ class TaskListTests(unittest.TestCase):
         self.assertEqual(task_list.get_count(), 2)
     
     def test_sorting_tasks(self):
+        task_list = self._create_test_list()
+
+        tasks = task_list.get_sort_date().get_all_tasks()
+
+        self.assertEqual(tasks[0].title, "Task 2")
+        self.assertEqual(tasks[1].title, "Task 5")
+        self.assertEqual(tasks[2].title, "Task 1")
+        self.assertEqual(tasks[3].title, "Task 6")
+        self.assertEqual(tasks[4].title, "Task 3")
+        self.assertEqual(tasks[5].title, "Task 4")
+
+    def test_merge_tasks(self):
+        list_1 = self._create_test_list()
+        list_2 = self._create_test_list()
+        list_3 = self._create_test_list()
+
+        merged_list = merge_task_lists([list_1, list_2, list_3])
+
+        self.assertEqual(merged_list.get_count(), 18)
+
+    def _create_test_list(self):
         today = date.today()
         yesterday = today - timedelta(days=1)
         tomorrow = today + timedelta(days=1)
@@ -102,16 +123,7 @@ class TaskListTests(unittest.TestCase):
         task5 = Task("Task 5", yesterday)
         task6 = Task("Task 6", today)
 
-        task_list = TaskList([task1, task2, task3, task4, task5, task6])
-
-        tasks = task_list.get_sort_date().get_all_tasks()
-
-        self.assertEqual(tasks[0].title, "Task 2")
-        self.assertEqual(tasks[1].title, "Task 5")
-        self.assertEqual(tasks[2].title, "Task 1")
-        self.assertEqual(tasks[3].title, "Task 6")
-        self.assertEqual(tasks[4].title, "Task 3")
-        self.assertEqual(tasks[5].title, "Task 4")
+        return TaskList([task1, task2, task3, task4, task5, task6])
 
 if __name__ == "__main__":
     unittest.main()
