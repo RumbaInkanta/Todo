@@ -34,10 +34,24 @@ class MainScreen(Screen):
         self.ids.datetime_label.text = f"Сегодня: {date.today().strftime('%d.%m.%Y')}"
 
         for p in self.projects:
-            self.ids.projects.add_widget(ProjectListItem(project=p, main_screen=self, text=p.project_title, on_release=lambda x: x.on_click()))
+            self.ids.projects.add_widget(ProjectListItem(project=p, main_screen=self, is_dynamic=False, text=p.project_title, on_release=lambda x: x.on_click()))
+
+        self.update_dynamic_projects()
 
     def open_edit(self):
         self.manager.current = 'task_edit'
+
+    def update_dynamic_projects(self):
+        today_lists = []
+
+        for p in self.projects:
+            today_lists.append(p.task_list.get_today())
+
+        today_proj = md.Project(project_title="Today", task_list=md.merge_task_lists(today_lists))
+
+        self.ids.dynamic_projects.clear_widgets()
+
+        self.ids.dynamic_projects.add_widget(ProjectListItem(project=today_proj, main_screen=self, is_dynamic=True, text=today_proj.project_title, on_release=lambda x: x.on_click()))
     
     @mainthread
     def on_new_task(self):
@@ -56,6 +70,8 @@ class MainScreen(Screen):
             self._write_project_to_file(self._selected_project.project)
             self.ids.new_task_title.text = ''
             self.ids.new_task_title.focus = False
+
+            self.update_dynamic_projects()
         else:
             self.ids.new_task_title.text = "Введите название"
     
@@ -70,6 +86,7 @@ class MainScreen(Screen):
     def on_task_change(self):
         self._selected_project.render_tasks()
         self._write_project_to_file(self._selected_project.project)
+        self.update_dynamic_projects()
 
     def on_task_delete(self, task: md.Task):
         removed = self._selected_project.project.task_list.remove(task.id)
@@ -87,7 +104,7 @@ class MainScreen(Screen):
         if project_title:
             proj = md.Project(project_title)
             self.projects.append(proj)
-            self.ids.projects.add_widget(ProjectListItem(proj, main_screen=self, text=proj.project_title, on_release=lambda x: x.on_click()))
+            self.ids.projects.add_widget(ProjectListItem(proj, main_screen=self, is_dynamic=False, text=proj.project_title, on_release=lambda x: x.on_click()))
             self.ids.new_project_title.text = ''
         else:
             self.ids.new_project_title.hint_text = "Введите название"
@@ -113,17 +130,18 @@ class MainScreen(Screen):
         return projects
 
 class ProjectListItem(OneLineListItem):
-    def __init__(self, project: md.Project, main_screen: MainScreen, *args, **kwargs):
+    def __init__(self, project: md.Project, main_screen: MainScreen, is_dynamic: bool, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project = project
         self._task_list_container = main_screen.ids.tasks
         self._main_screen = main_screen
+        self._is_dynamic = is_dynamic
 
     def on_click(self):
         self._set_current_project()
         self.render_tasks()
-        self._main_screen.ids.new_task_title.disabled = False
-        self._main_screen.ids.new_task_button.disabled = False
+        self._main_screen.ids.new_task_title.disabled = self._is_dynamic
+        self._main_screen.ids.new_task_button.disabled = self._is_dynamic
 
     def _set_current_project(self):
         self._main_screen._selected_project = self
@@ -131,22 +149,28 @@ class ProjectListItem(OneLineListItem):
     def render_tasks(self):
         self._task_list_container.clear_widgets()
 
-        writer = create_writer(self.project)
+        change_callback = None
+
+        if not self._is_dynamic:
+            writer = create_writer(self.project)
+            change_callback = lambda: writer.write_list(self.project.task_list)
         
         for t in self.project.task_list.get_all_tasks():
-            self._task_list_container.add_widget(TaskListItem(task=t, main_screen=self._main_screen, on_change=lambda: writer.write_list(self.project.task_list)))
+            self._task_list_container.add_widget(TaskListItem(task=t, main_screen=self._main_screen, is_dynamic=self._is_dynamic, on_change=change_callback))
 
 class TaskListItem(BoxLayout):
 
-    def __init__(self, task: md.Task, main_screen: MainScreen, on_change=None, *args, **kwargs):
+    def __init__(self, task: md.Task, main_screen: MainScreen, is_dynamic: bool, on_change=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._task = task
         self._main_screen = main_screen
         
-        self.add_widget(TaskCheckbox(task=task, on_change=on_change, width='48dp', size_hint=(.15,1)))
+        self.add_widget(TaskCheckbox(task=task, on_change=on_change, disabled=is_dynamic, width='48dp', size_hint=(.15,1)))
         self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description))
         self.add_widget(MDLabel(text=task.due_date.strftime('%d.%m.%Y'), size_hint=(.30,1)))
-        self.add_widget(MDIconButton(icon='pencil', on_press=self.switch_to_edit))
+
+        if not is_dynamic:
+            self.add_widget(MDIconButton(icon='pencil', on_press=self.switch_to_edit))
 
     def switch_to_edit(self, instance):
         task_edit_screen = self._main_screen.manager.get_screen('task_edit')
