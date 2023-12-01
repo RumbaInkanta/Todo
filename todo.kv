@@ -50,13 +50,18 @@ ScreenManager:
         MDBoxLayout:
             size_hint: 1, .8
             MDBoxLayout:
+                orientation: 'vertical'
                 size_hint: .35, 1
                 MDScrollView:
+                    size_hint_y: 0.8
                     MDList:
                         id: projects
                 MDScrollView:
+                    size_hint_y: 0.2
                     MDList:
                         id: dynamic_projects
+                        
+
             MDBoxLayout:
                 size_hint: .65, 1
                 MDScrollView:

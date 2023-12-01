@@ -47,7 +47,7 @@ class MainScreen(Screen):
         for p in self.projects:
             today_lists.append(p.task_list.get_today())
 
-        today_proj = md.Project(project_title="Today", task_list=md.merge_task_lists(today_lists))
+        today_proj = md.Project(project_title='Сегодня', task_list=md.merge_task_lists(today_lists))
 
         self.ids.dynamic_projects.clear_widgets()
 
