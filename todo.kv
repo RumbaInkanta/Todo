@@ -15,7 +15,7 @@ ScreenManager:
         MDBoxLayout:
             size_hint: 1, .1        
             MDBoxLayout:
-                size_hint: .35, 1
+                size_hint: .3, 1
                 padding: [10, 5, 5, 0]
                 MDTextField:
                     id: new_project_title
@@ -30,7 +30,7 @@ ScreenManager:
                     on_press: root.on_new_project()
                     disabled: False
             MDBoxLayout:
-                size_hint: .65, 1
+                size_hint: .7, 1
                 padding: [5, 5, 5, 0]
                 MDBoxLayout:
                     MDTextField:
@@ -51,7 +51,7 @@ ScreenManager:
             size_hint: 1, .8
             MDBoxLayout:
                 orientation: 'vertical'
-                size_hint: .35, 1
+                size_hint: .3, 1
                 MDScrollView:
                     size_hint_y: 0.8
                     MDList:
@@ -63,7 +63,7 @@ ScreenManager:
                         
 
             MDBoxLayout:
-                size_hint: .65, 1
+                size_hint: .7, 1
                 MDScrollView:
                     MDList:
                         id: tasks

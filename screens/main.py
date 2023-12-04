@@ -45,7 +45,7 @@ class MainScreen(Screen):
         today_lists = []
 
         for p in self.projects:
-            today_lists.append(p.task_list.get_today())
+            today_lists.append(p.task_list.get_today().get_undone())
 
         today_proj = md.Project(project_title='Сегодня', task_list=md.merge_task_lists(today_lists))
 
@@ -146,14 +146,18 @@ class ProjectListItem(OneLineListItem):
     def _set_current_project(self):
         self._main_screen._selected_project = self
 
+    def _task_change_callback(self):
+        writer = create_writer(self.project)
+        writer.write_list(self.project.task_list)
+        self._main_screen.update_dynamic_projects()
+
     def render_tasks(self):
         self._task_list_container.clear_widgets()
 
         change_callback = None
 
         if not self._is_dynamic:
-            writer = create_writer(self.project)
-            change_callback = lambda: writer.write_list(self.project.task_list)
+            change_callback = self._task_change_callback
         
         for t in self.project.task_list.get_all_tasks():
             self._task_list_container.add_widget(TaskListItem(task=t, main_screen=self._main_screen, is_dynamic=self._is_dynamic, on_change=change_callback))
@@ -165,7 +169,9 @@ class TaskListItem(BoxLayout):
         self._task = task
         self._main_screen = main_screen
         
-        self.add_widget(TaskCheckbox(task=task, on_change=on_change, disabled=is_dynamic, width='48dp', size_hint=(.15,1)))
+        if not is_dynamic:
+            self.add_widget(TaskCheckbox(task=task, on_change=on_change, disabled=is_dynamic, width='48dp', size_hint=(.15,1)))
+
         self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description))
         self.add_widget(MDLabel(text=task.due_date.strftime('%d.%m.%Y'), size_hint=(.30,1)))
 
