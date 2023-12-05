@@ -164,7 +164,11 @@ class ProjectListItem(OneLineListItem):
         if not self._is_dynamic:
             change_callback = self._task_change_callback
         
-        for t in self.project.task_list.get_all_tasks():
+        all_tasks = self.project.task_list.get_all_tasks()
+
+        sorted_tasks = sorted(all_tasks, key=lambda x: (x.checked, x.due_date))
+
+        for t in sorted_tasks:
             self._task_list_container.add_widget(TaskListItem(task=t, main_screen=self._main_screen, is_dynamic=self._is_dynamic, on_change=change_callback))
 
 class TaskListItem(BoxLayout):
