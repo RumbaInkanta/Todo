@@ -43,15 +43,20 @@ class MainScreen(Screen):
 
     def update_dynamic_projects(self):
         today_lists = []
+        soon_list = []
 
         for p in self.projects:
-            today_lists.append(p.task_list.get_today().get_undone())
+            today_lists.append(p.task_list.get_today_or_overdue().get_undone())
+            soon_list.append(p.task_list.get_soon().get_undone())
 
         today_proj = md.Project(project_title='Сегодня', task_list=md.merge_task_lists(today_lists))
+        soon_proj = md.Project(project_title='Скоро', task_list=md.merge_task_lists(soon_list))
+
 
         self.ids.dynamic_projects.clear_widgets()
 
         self.ids.dynamic_projects.add_widget(ProjectListItem(project=today_proj, main_screen=self, is_dynamic=True, text=today_proj.project_title, on_release=lambda x: x.on_click()))
+        self.ids.dynamic_projects.add_widget(ProjectListItem(project=soon_proj, main_screen=self, is_dynamic=True, text=soon_proj.project_title, on_release=lambda x: x.on_click()))
     
     @mainthread
     def on_new_task(self):

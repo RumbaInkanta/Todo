@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 import uuid, itertools
 from utils import *
 
@@ -100,6 +100,15 @@ class TaskList:
     def get_today(self):
         return self.get_on_date(date.today())
 
+    def get_today_or_overdue(self):
+        tasks = filter(lambda x: x.due_date <= date.today(), self.tasks)
+        return TaskList(list(tasks))
+
+    def get_soon(self):
+        soon_days = date.today() + timedelta(weeks=2)
+        tasks = filter(lambda x: x.due_date > date.today() and x.due_date <= soon_days, self.tasks)
+        return TaskList(list(tasks))
+
     def get_on_date(self, on_date: date):
         tasks = filter(lambda x: x.due_date == on_date, self.tasks)
         return TaskList(list(tasks))
@@ -114,6 +123,7 @@ class TaskList:
 
     def get_all_tasks(self):
         return self.tasks.copy()
+
 
 class Project:
     def __init__(self, project_title: str, task_list: TaskList = None):
