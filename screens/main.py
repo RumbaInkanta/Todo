@@ -177,7 +177,7 @@ class TaskListItem(BoxLayout):
         if not is_dynamic:
             self.add_widget(TaskCheckbox(task=task, on_change=on_change, disabled=is_dynamic, width='48dp', size_hint=(.15,1)))
 
-        self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description))
+        self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description, on_press=self.switch_to_edit))
         self.add_widget(MDLabel(text=task.due_date.strftime('%d.%m.%Y'), size_hint=(.30,1)))
 
         if not is_dynamic:
