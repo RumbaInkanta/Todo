@@ -1,3 +1,5 @@
 *.csv
+*.db
+*.txt
 __pycache__/*
 screens/__pycache__/*

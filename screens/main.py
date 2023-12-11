@@ -17,6 +17,7 @@ from kivy.clock import Clock
 from kivy.clock import mainthread
 import model as md
 import keyboard
+import db_connection as db
 
 def path_parse():
     return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,6 +29,7 @@ class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
         keyboard.add_hotkey('ctrl+enter', self.on_new_task)
+        self.project_id = None
 
     def fill_data(self):
         self.projects = self._read_all_projects()
@@ -70,6 +72,10 @@ class MainScreen(Screen):
             else:
                 descr = ''
             
+            db_connection = db.DatabaseConnection()            
+            db_connection.insert_task(txt, 0, due_date=date.today(), description=descr, project_id=self.project_id)
+            db_connection.disconnect()
+
             self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
             self._selected_project.render_tasks()
             self._write_project_to_file(self._selected_project.project)
@@ -105,7 +111,21 @@ class MainScreen(Screen):
     def on_new_project(self):
 
         project_title=self.ids.new_project_title.text
-        
+
+        db_connection = db.DatabaseConnection()
+
+        if not db_connection.table_exists('projects'):
+            db_connection.create_tables()
+
+        project_id = db_connection.get_project_id_by_title(project_title)
+
+        if not project_id:
+            project_id = db_connection.insert_project(project_title)
+
+        self.project_id = project_id
+
+        db_connection.disconnect()
+
         if project_title:
             proj = md.Project(project_title)
             self.projects.append(proj)
@@ -113,7 +133,6 @@ class MainScreen(Screen):
             self.ids.new_project_title.text = ''
         else:
             self.ids.new_project_title.hint_text = "Введите название"
-            
 
     def _write_project_to_file(self, project: md.Project) -> None:
         writer = create_writer(project)
