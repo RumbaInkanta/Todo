@@ -139,8 +139,25 @@ class MainScreen(Screen):
         writer.write_list(project.task_list)
 
     def _read_all_projects(self) -> []:
+
+        db_connection = db.DatabaseConnection()
+
+        if not db_connection.table_exists("projects"):
+            db_connection.disconnect()
+            return []
+
+        db_connection.execute_query("SELECT * FROM projects")
+        projects_data = db_connection.fetch_all()
+
+        db_connection.disconnect()
+
+        projects = []
+        for project_data in projects_data:
+            project_id, project_title = project_data
+            project = md.Project(project_title)
+            projects.append(project)
         
-        csv_files = [f for f in os.listdir(path_parse()) if f.endswith('.csv')]
+        '''csv_files = [f for f in os.listdir(path_parse()) if f.endswith('.csv')]
 
         projects = []
 
@@ -149,7 +166,7 @@ class MainScreen(Screen):
             reader = TaskReader(os.path.join(path_parse(), csv))
             task_list = reader.read_list()
             project = md.Project(project_title, task_list=task_list)
-            projects.append(project)
+            projects.append(project)'''
 
         return projects
 
@@ -169,6 +186,9 @@ class ProjectListItem(OneLineListItem):
 
     def _set_current_project(self):
         self._main_screen._selected_project = self
+        db_connection = db.DatabaseConnection()
+        MainScreen.project_id = db_connection.get_project_id_by_title(self._main_screen._selected_project.project.project_title)
+        db_connection.disconnect()
 
     def _task_change_callback(self):
         writer = create_writer(self.project)
