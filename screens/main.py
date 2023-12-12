@@ -137,6 +137,7 @@ class MainScreen(Screen):
             self.projects.append(proj)
             self.ids.projects.add_widget(ProjectListItem(proj, main_screen=self, is_dynamic=False, text=proj.project_title, on_release=lambda x: x.on_click()))
             self.ids.new_project_title.text = ''
+            self.ids.tasks.clear_widgets()
         else:
             self.ids.new_project_title.hint_text = "Введите название"
 
@@ -192,7 +193,7 @@ class ProjectListItem(OneLineListItem):
     def _set_current_project(self):
         self._main_screen._selected_project = self
         db_connection = db.DatabaseConnection()
-        self.project_id = db_connection.get_project_id_by_title(self._main_screen._selected_project.project.project_title)
+        MainScreen.project_id = db_connection.get_project_id_by_title(self._main_screen._selected_project.project.project_title)
         db_connection.disconnect()
 
     def _task_change_callback(self):
