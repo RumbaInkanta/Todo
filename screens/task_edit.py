@@ -5,6 +5,7 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton, MDFillRoundFlatIconButton
 from screens.main import TaskListItem, MainScreen
 import model as md
+import db_connection as db
 from datetime import date
 
 
@@ -52,7 +53,9 @@ class TaskEditScreen(Screen):
         self._task.title = self.ids.edit_task_title.text
         self._task.description = self.ids.edit_task_description.text
         self._task.due_date = date.fromisoformat(self.ids.edit_task_due_date.text)
-
+        db_connection = db.DatabaseConnection()
+        db_connection.update_task(self._task.id, self._task.title, 0, self._task.due_date, self._task.description, self.get_main_screen()._selected_project.project_id)
+        db_connection.disconnect()
         self.get_main_screen().on_task_change()
 
         self.switch_to_main()
