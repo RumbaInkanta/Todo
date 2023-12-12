@@ -124,3 +124,16 @@ class DatabaseConnection:
         query = "UPDATE tasks SET checked = ? WHERE id = ?"
         self.execute_query(query, (checked, task_id))
         self.commit()
+    
+    def delete_task(self, task_id):
+        query_task_exists = "SELECT 1 FROM tasks WHERE id = ?"
+        self.execute_query(query_task_exists, (task_id,))
+        task_exists = bool(self.fetch_one())
+
+        if not task_exists:
+            print("Задача с ID {} не существует.".format(task_id))
+            return
+
+        query = "DELETE FROM tasks WHERE id = ?"
+        self.execute_query(query, (task_id,))
+        self.commit()

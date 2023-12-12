@@ -107,6 +107,10 @@ class MainScreen(Screen):
         if not removed:
             print(f'Cannot find task {task.id}')
             return
+        
+        db_connection = db.DatabaseConnection()
+        db_connection.delete_task(task.id)
+        db_connection.disconnect()
 
         self.on_task_change()
 
