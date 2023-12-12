@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import date, datetime
+from datetime import date
 from task_writer import TaskWriter
 from task_reader import TaskReader
 from kivymd.app import MDApp
@@ -30,7 +30,6 @@ class MainScreen(Screen):
         super(MainScreen, self).__init__(**kwargs)
         keyboard.add_hotkey('ctrl+enter', self.on_new_task)
         self.project_id = None
-        self._selected_project = None
 
     def fill_data(self):
         self.projects = self._read_all_projects()
@@ -74,7 +73,7 @@ class MainScreen(Screen):
                 descr = ''
             
             db_connection = db.DatabaseConnection()            
-            db_connection.insert_task(txt, 0, due_date=date.today(), description=descr, project_id=MainScreen.project_id)
+            db_connection.insert_task(txt, 0, due_date=date.today(), description=descr, project_id=self.project_id)
             db_connection.disconnect()
 
             self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
@@ -91,7 +90,7 @@ class MainScreen(Screen):
         Clock.schedule_once(self.on_new_task, 0)
 
     def on_key_down(self, window, keycode, scancode, codepoint, modifier):
- 
+        # Проверка, что TextInput активен
         if self.ids.new_task_title.focus and 'ctrl' in modifier and keycode == 40:  # Код клавиши Enter
             self.schedule_on_new_task()
 
@@ -188,13 +187,10 @@ class ProjectListItem(OneLineListItem):
     def _set_current_project(self):
         self._main_screen._selected_project = self
         db_connection = db.DatabaseConnection()
-        self.project_id = db_connection.get_project_id_by_title(self._main_screen._selected_project.project.project_title)
+        MainScreen.project_id = db_connection.get_project_id_by_title(self._main_screen._selected_project.project.project_title)
         db_connection.disconnect()
 
     def _task_change_callback(self):
-        #db_connection = db.DatabaseConnection()
-
-        #db_connection.disconnect()
         writer = create_writer(self.project)
         writer.write_list(self.project.task_list)
         self._main_screen.update_dynamic_projects()
@@ -206,25 +202,10 @@ class ProjectListItem(OneLineListItem):
 
         if not self._is_dynamic:
             change_callback = self._task_change_callback
-        #all_tasks = self.project.task_list.get_all_tasks()
-        db_connection = db.DatabaseConnection()
+        
+        all_tasks = self.project.task_list.get_all_tasks()
 
-        if not db_connection.table_exists("tasks"):
-            db_connection.disconnect()
-            return
-
-        db_connection.execute_query("SELECT * FROM tasks WHERE project_id=?", (self.project_id,))
-        tasks_data = db_connection.fetch_all()
-
-        db_connection.disconnect()
-
-        tasks = []
-        for task_data in tasks_data:
-            task_id, title, due_date, checked, description, created_date, project_id = task_data
-            task = md.Task(title, checked, description, due_date, created_date, project_id, id=task_id)
-            tasks.append(task)
-
-        sorted_tasks = sorted(tasks, key=lambda x: (x.checked, x.due_date))
+        sorted_tasks = sorted(all_tasks, key=lambda x: (x.checked, x.due_date))
 
         for t in sorted_tasks:
             self._task_list_container.add_widget(TaskListItem(task=t, main_screen=self._main_screen, is_dynamic=self._is_dynamic, on_change=change_callback))
@@ -240,9 +221,7 @@ class TaskListItem(BoxLayout):
             self.add_widget(TaskCheckbox(task=task, on_change=on_change, disabled=is_dynamic, width='48dp', size_hint=(.15,1)))
 
         self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description, on_press=self.switch_to_edit))
-        
-        due_date_str = datetime.strptime(task.due_date, "%Y-%m-%d").date()
-        self.add_widget(MDLabel(text=str(due_date_str), size_hint=(.30,1)))
+        self.add_widget(MDLabel(text=task.due_date.strftime('%d.%m.%Y'), size_hint=(.30,1)))
 
         if not is_dynamic:
             self.add_widget(MDIconButton(icon='pencil', on_press=self.switch_to_edit))

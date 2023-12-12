@@ -3,14 +3,13 @@ import uuid, itertools
 from utils import *
 
 class Task:
-    def __init__(self, title: str, due_date: date, description='', checked=False, created_date=date.today(), project_id=None, id=None):
+    def __init__(self, title: str, due_date: date, description =''):
         self.title = title
-        self.checked = checked
+        self.checked = False
         self.due_date = due_date
         self.description = description
-        self.id = id if id else uuid.uuid4()
-        self._created_date = created_date
-        self.project_id = project_id
+        self.id = uuid.uuid4()
+        self._created_date = date.today()
 
     def __repr__(self) -> str:
         output = self.title

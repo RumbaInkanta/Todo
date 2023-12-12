@@ -85,29 +85,3 @@ class DatabaseConnection:
         self.execute_query(query, (project_title,))
         result = self.fetch_one()
         return result[0] if result else None
-    
-    def update_project(self, project_id, new_project_title):
-        query = "UPDATE projects SET project_title = ? WHERE id = ?"
-        self.execute_query(query, (new_project_title, project_id))
-        self.commit()
-
-    def update_task(self, task_id, title, checked, due_date, description, project_id):
-
-        query_task_exists = "SELECT 1 FROM tasks WHERE id = ?"
-        self.execute_query(query_task_exists, (task_id,))
-        task_exists = bool(self.fetch_one())
-
-        if not task_exists:
-            print("Задача с ID {} не существует.".format(task_id))
-            return
-
-        query_project_exists = "SELECT 1 FROM projects WHERE id = ?"
-        self.execute_query(query_project_exists, (project_id,))
-        project_exists = bool(self.fetch_one())
-
-        if not project_exists:
-            print("Проект с ID {} не существует.".format(project_id))
-            return
-        query = "UPDATE tasks SET title = ?, checked = ?, due_date = ?, description = ?, project_id = ? WHERE id = ?"
-        self.execute_query(query, (title, checked, due_date, description, project_id, task_id))
-        self.commit()
