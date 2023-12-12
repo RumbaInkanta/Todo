@@ -19,6 +19,7 @@ import model as md
 import keyboard
 import db_connection as db
 
+
 def path_parse():
     return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -140,7 +141,6 @@ class MainScreen(Screen):
         writer.write_list(project.task_list)
 
     def _read_all_projects(self) -> []:
-
         db_connection = db.DatabaseConnection()
 
         if not db_connection.table_exists("projects"):
@@ -150,26 +150,26 @@ class MainScreen(Screen):
         db_connection.execute_query("SELECT * FROM projects")
         projects_data = db_connection.fetch_all()
 
-        db_connection.disconnect()
-
         projects = []
         for project_data in projects_data:
             project_id, project_title = project_data
-            project = md.Project(project_title)
+
+            db_connection.execute_query("SELECT * FROM tasks WHERE project_id = ?", (project_id,))
+            tasks_data = db_connection.fetch_all()
+
+            tasks = []
+            for task_data in tasks_data:
+                task_id, title, checked, due_date, description, created_date, _ = task_data
+                task = md.Task(id=task_id, title=title, checked=bool(checked), due_date=date.fromisoformat(due_date),
+                            description=description, created_date=datetime.strptime(created_date, "%Y-%m-%d %H:%M:%S.%f").date())
+                tasks.append(task)
+
+            project = md.Project(project_title, task_list=md.TaskList(tasks))
             projects.append(project)
-        
-        '''csv_files = [f for f in os.listdir(path_parse()) if f.endswith('.csv')]
 
-        projects = []
-
-        for csv in csv_files:
-            project_title, _ = os.path.splitext(csv)
-            reader = TaskReader(os.path.join(path_parse(), csv))
-            task_list = reader.read_list()
-            project = md.Project(project_title, task_list=task_list)
-            projects.append(project)'''
-
+        db_connection.disconnect()
         return projects
+
 
 class ProjectListItem(OneLineListItem):
     def __init__(self, project: md.Project, main_screen: MainScreen, is_dynamic: bool, *args, **kwargs):
@@ -192,9 +192,6 @@ class ProjectListItem(OneLineListItem):
         db_connection.disconnect()
 
     def _task_change_callback(self):
-        #db_connection = db.DatabaseConnection()
-
-        #db_connection.disconnect()
         writer = create_writer(self.project)
         writer.write_list(self.project.task_list)
         self._main_screen.update_dynamic_projects()
@@ -206,25 +203,10 @@ class ProjectListItem(OneLineListItem):
 
         if not self._is_dynamic:
             change_callback = self._task_change_callback
-        
-        db_connection = db.DatabaseConnection()
+              
+        all_tasks = self.project.task_list.get_all_tasks()
 
-        if not db_connection.table_exists("tasks"):
-            db_connection.disconnect()
-            return
-
-        db_connection.execute_query("SELECT * FROM tasks WHERE project_id=?", (self.project_id,))
-        tasks_data = db_connection.fetch_all()
-
-        db_connection.disconnect()
-
-        tasks = []
-        for task_data in tasks_data:
-            task_id, title, due_date, checked, description, created_date, project_id = task_data
-            task = md.Task(title, checked, description, due_date, created_date, project_id, id=task_id)
-            tasks.append(task)
-
-        sorted_tasks = sorted(tasks, key=lambda x: (x.checked, x.due_date))
+        sorted_tasks = sorted(all_tasks, key=lambda x: (x.checked, x.due_date))
 
         for t in sorted_tasks:
             self._task_list_container.add_widget(TaskListItem(task=t, main_screen=self._main_screen, is_dynamic=self._is_dynamic, on_change=change_callback))
@@ -241,8 +223,7 @@ class TaskListItem(BoxLayout):
 
         self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description, on_press=self.switch_to_edit))
         
-        due_date_str = datetime.strptime(task.due_date, "%Y-%m-%d").date()
-        self.add_widget(MDLabel(text=str(due_date_str), size_hint=(.30,1)))
+        self.add_widget(MDLabel(text=str(task.due_date), size_hint=(.30,1)))
 
         if not is_dynamic:
             self.add_widget(MDIconButton(icon='pencil', on_press=self.switch_to_edit))

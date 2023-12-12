@@ -135,8 +135,6 @@ class Project:
         else:
             self._task_list = task_list
 
-    # project_title
-
     @property
     def project_title(self) -> str:
         return self._project_title
@@ -144,8 +142,6 @@ class Project:
     @project_title.setter
     def project_title(self, value: str):
         self._project_title = value
-
-    # task_list
 
     @property
     def task_list(self) -> TaskList:
