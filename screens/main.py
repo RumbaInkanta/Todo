@@ -250,4 +250,7 @@ class TaskCheckbox(IRightBodyTouch, MDCheckbox):
 
         if self._on_change:
             self._on_change()
+            db_connection = db.DatabaseConnection()
+            db_connection.update_task_checked(self.active, self._task.id)
+            db_connection.disconnect()
 
