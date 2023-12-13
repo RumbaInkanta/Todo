@@ -78,9 +78,10 @@ class TaskList:
     def add(self, task):
         self.tasks.append(task)
 
-    def add_task(self, title: str, due: date, description: str = ""):
+    def add_task(self, title: str, due: date, description: str = "") -> Task:
         task = Task(title, due, description)
         self.add(task)
+        return task
 
     def remove(self, id: uuid) -> bool:
         index = self._find_index(id)
@@ -127,8 +128,9 @@ class TaskList:
 
 
 class Project:
-    def __init__(self, project_title: str, task_list: TaskList = None):
+    def __init__(self, project_title: str, task_list: TaskList = None, id: uuid = None):
         self._project_title = project_title
+        self.id = id if id else uuid.uuid4()
         
         if task_list is None:
             self._task_list = TaskList()

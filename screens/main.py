@@ -25,8 +25,9 @@ class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
         keyboard.add_hotkey('ctrl+enter', self.on_new_task)
-        self.project_id = None
         self._selected_project = None
+
+        db.DatabaseConnection().ensure_schema_created()
 
     def fill_data(self):
         self.projects = self._read_all_projects()
@@ -69,11 +70,11 @@ class MainScreen(Screen):
             else:
                 descr = ''
             
-            db_connection = db.DatabaseConnection()            
-            db_connection.insert_task(txt, 0, due_date=date.today(), description=descr, project_id=MainScreen.project_id)
-            db_connection.disconnect()
+            task = self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
 
-            self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
+            db_connection = db.DatabaseConnection()            
+            db_connection.insert_task(project=self._selected_project.project, task=task)
+
             self._selected_project.render_tasks()
             #self._write_project_to_file(self._selected_project.project)
             self.ids.new_task_title.text = ''
@@ -105,7 +106,6 @@ class MainScreen(Screen):
         
         db_connection = db.DatabaseConnection()
         db_connection.delete_task(task.id)
-        db_connection.disconnect()
 
         self.on_task_change()
 
@@ -113,28 +113,18 @@ class MainScreen(Screen):
 
         project_title=self.ids.new_project_title.text
 
-        db_connection = db.DatabaseConnection()
-
-        if not db_connection.table_exists('projects'):
-            db_connection.create_tables()
-
-        project_id = db_connection.get_project_id_by_title(project_title)
-
-        if not project_id:
-            project_id = db_connection.insert_project(project_title)
-
-        self.project_id = project_id
-
-        db_connection.disconnect()
-
         if project_title:
-            proj = md.Project(project_title)
+            
+            proj = md.Project(project_title=project_title)
+
+            db_connection = db.DatabaseConnection()
+            db_connection.insert_project(proj)
+
             self.projects.append(proj)
-            self.ids.projects.add_widget(ProjectListItem(proj, main_screen=self, is_dynamic=False, text=proj.project_title, on_release=lambda x: x.on_click()))
+            item = ProjectListItem(proj, main_screen=self, is_dynamic=False, text=proj.project_title, on_release=lambda x: x.on_click())
+            self.ids.projects.add_widget(item)
             self.ids.new_project_title.text = ''
-            self.ids.tasks.clear_widgets()
-            self.ids.new_task_title.disabled = False
-            self.ids.new_task_button.disabled = False
+            item.on_click()
         else:
             self.ids.new_project_title.hint_text = "Введите название"
 
@@ -144,32 +134,7 @@ class MainScreen(Screen):
 
     def _read_all_projects(self) -> []:
         db_connection = db.DatabaseConnection()
-
-        if not db_connection.table_exists("projects"):
-            db_connection.disconnect()
-            return []
-
-        db_connection.execute_query("SELECT * FROM projects")
-        projects_data = db_connection.fetch_all()
-
-        projects = []
-        for project_data in projects_data:
-            project_id, project_title = project_data
-
-            db_connection.execute_query("SELECT * FROM tasks WHERE project_id = ?", (project_id,))
-            tasks_data = db_connection.fetch_all()
-
-            tasks = []
-            for task_data in tasks_data:
-                task_id, title, checked, due_date, description, created_date, _ = task_data
-                task = md.Task(id=task_id, title=title, checked=bool(checked), due_date=date.fromisoformat(due_date),
-                            description=description, created_date=datetime.strptime(created_date, "%Y-%m-%d %H:%M:%S.%f").date())
-                tasks.append(task)
-
-            project = md.Project(project_title, task_list=md.TaskList(tasks))
-            projects.append(project)
-
-        db_connection.disconnect()
+        projects = db_connection.get_all_projects()
         return projects
 
 
@@ -189,9 +154,6 @@ class ProjectListItem(OneLineListItem):
 
     def _set_current_project(self):
         self._main_screen._selected_project = self
-        db_connection = db.DatabaseConnection()
-        MainScreen.project_id = db_connection.get_project_id_by_title(self._main_screen._selected_project.project.project_title)
-        db_connection.disconnect()
 
     def _task_change_callback(self):
         #writer = create_writer(self.project)
@@ -254,5 +216,4 @@ class TaskCheckbox(IRightBodyTouch, MDCheckbox):
             self._on_change()
             db_connection = db.DatabaseConnection()
             db_connection.update_task_checked(self.active, self._task.id)
-            db_connection.disconnect()
 
