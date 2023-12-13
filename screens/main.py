@@ -7,7 +7,6 @@ from kivymd.uix.list import OneLineListItem, TwoLineListItem
 from kivymd.uix.boxlayout import BoxLayout
 from kivy.lang import Builder
 from kivy.core.window import Window
-from kivymd.uix.label import MDLabel
 from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
 from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.uix.button import MDIconButton
@@ -133,6 +132,8 @@ class MainScreen(Screen):
             self.ids.projects.add_widget(ProjectListItem(proj, main_screen=self, is_dynamic=False, text=proj.project_title, on_release=lambda x: x.on_click()))
             self.ids.new_project_title.text = ''
             self.ids.tasks.clear_widgets()
+            self.ids.new_task_title.disabled = False
+            self.ids.new_task_button.disabled = False
         else:
             self.ids.new_project_title.hint_text = "Введите название"
 

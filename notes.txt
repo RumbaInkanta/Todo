@@ -1,13 +1,200 @@
-tasks (
-        id UUID PRIMARY KEY,
-        title TEXT,
-        checked INTEGER,
-        due_date TEXT,
-        description TEXT,
-        created_date TEXT,
-	project_id UUID foreign key projects(id)
-    )
-projects (
-	id UUID PRIMARY KEY,
-        project_title TEX
-    )
+#:kivy 2.2.1
+
+<TaskListItem>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '72dp'
+
+ScreenManager:
+    MainScreen:
+        name: 'main'
+    TaskEditScreen:
+        name: 'task_edit'
+
+<MainScreen>:
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 1  # Светло-серый фон
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: '10dp'
+
+        MDBoxLayout:
+            size_hint: 1, .1
+            spacing: '5dp'
+            MDBoxLayout:
+                size_hint: .3, 1
+                padding: [10, 5, 5, 0]
+
+                MDTextField:
+                    id: new_project_title
+                    multiline: False
+                    icon_left: 'folder'
+                    hint_text: "Добавить проект"
+                    on_text_validate: root.on_new_project()
+
+                MDIconButton:
+                    id: new_project_button
+                    icon: 'plus'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    on_press: root.on_new_project()
+                    theme_text_color: "Custom"
+                    text_color: 0.18, 0.18, 0.18, 1  # Темно-серый цвет текста
+
+            MDBoxLayout:
+                size_hint: .7, 1
+                padding: [5, 5, 5, 0]
+
+                MDBoxLayout:
+                    spacing: '5dp'
+
+                    MDTextField:
+                        id: new_task_title
+                        hint_text: "Добавить задачу"
+                        multiline: True
+                        icon_left: 'checkbox-marked-circle-plus-outline'
+                        disabled: True
+                        on_text_validate: root.on_new_task()
+
+                    MDIconButton:
+                        id: new_task_button
+                        icon: 'plus'
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        on_press: root.on_new_task()
+                        theme_text_color: "Custom"
+                        text_color: 0.18, 0.18, 0.18, 1  # Темно-серый цвет текста
+
+        MDSeparator:
+
+        MDBoxLayout:
+            size_hint: 1, .8
+            spacing: '10dp'
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint: .3, 1
+
+                MDScrollView:
+                    size_hint_y: 0.7
+                    MDList:
+                        id: projects
+
+                MDSeparator:
+
+                MDScrollView:
+                    size_hint_y: 0.3
+                    MDList:
+                        id: dynamic_projects
+
+            MDBoxLayout:
+                size_hint: .7, 1
+
+                MDScrollView:
+                    MDList:
+                        id: tasks
+
+        MDSeparator:
+
+        MDBoxLayout:
+            size_hint: 1, .1
+            MDLabel:
+                id: datetime_label
+                padding: 10
+                size_hint_y: None
+                height: 50
+                theme_text_color: 'Secondary'
+
+<TaskEditScreen>:
+    canvas.before:
+        Color:
+            rgba: 0.95, 0.95, 0.95, 1  # Светло-серый фон
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    MDBoxLayout:
+        orientation: 'vertical'
+
+        MDBoxLayout:
+            padding: 10
+            size_hint: 1, .1
+
+            MDRoundFlatIconButton:
+                icon: 'arrow-left'
+                pos_hint: {'x': 0, 'top': 1}
+                text: 'Назад'
+                on_press: root.cancel_click()
+                theme_text_color: "Custom"
+                text_color: 0.18, 0.18, 0.18, 1  # Темно-серый цвет текста
+
+            MDLabel:
+                halign: 'center'
+                text: "Изменить задачу"
+
+        MDSeparator:
+
+        MDBoxLayout:
+            padding: 30
+            orientation: 'vertical'
+            size_hint: 1, .9
+
+            MDTextField:
+                id: edit_task_title
+                hint_text: 'Название'
+                multiline: False
+                size_hint: 1, .2
+
+            MDTextField:
+                id: edit_task_description
+                hint_text: 'Описание'
+                multiline: True
+                size_hint: 1, .4
+
+            MDBoxLayout:
+                size_hint: 1, .4
+                spacing: dp(10)
+
+                MDTextField:
+                    id: edit_task_due_date
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    hint_text: "Дата выполнения"
+                    multiline: False
+                    size_hint_x: None
+
+                MDRoundFlatIconButton:
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    size_hint_x: None
+                    icon: 'calendar'
+                    text: "Изменить дату"
+                    on_release: root.show_date_picker()
+                    theme_text_color: "Custom"
+                    text_color: 0.18, 0.18, 0.18, 1  # Темно-серый цвет текста
+
+            MDSeparator:
+
+            MDBoxLayout:
+                size_hint: 1, .2
+                padding: 10
+
+                MDRoundFlatIconButton:
+                    size_hint: .4, 1
+                    icon: 'delete'
+                    text: "Удалить задачу"
+                    on_release: root.show_confirmation_dialog()
+                    theme_text_color: "Custom"
+                    text_color: 0.85, 0.26, 0.21, 1  # Красный цвет для контраста
+
+                MDBoxLayout:
+                    size_hint: .2, 1
+
+                MDFillRoundFlatIconButton:
+                    size_hint: .4, 1
+                    icon: 'check-bold'
+                    text: 'Изменить задачу'
+                    on_press: root.change_task()
+                    theme_text_color: "Custom"
+                    text_color: 0.18, 0.18, 0.18, 1  # Темно-серый цвет текста
