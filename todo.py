@@ -2,8 +2,6 @@ import os
 import sys
 from datetime import date
 from model import Task, TaskList, Project
-from task_writer import TaskWriter
-from task_reader import TaskReader
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.uix.list import OneLineListItem, TwoLineListItem

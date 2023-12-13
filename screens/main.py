@@ -1,8 +1,6 @@
 import os
 import sys
 from datetime import date, datetime
-from task_writer import TaskWriter
-from task_reader import TaskReader
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.uix.list import OneLineListItem, TwoLineListItem
@@ -22,9 +20,6 @@ import db_connection as db
 
 def path_parse():
     return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-def create_writer(project: md.Project) -> TaskWriter:
-    return TaskWriter(os.path.join(path_parse(), project.project_title + '.csv'))
 
 class MainScreen(Screen):
     def __init__(self, **kwargs):
@@ -80,7 +75,7 @@ class MainScreen(Screen):
 
             self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
             self._selected_project.render_tasks()
-            self._write_project_to_file(self._selected_project.project)
+            #self._write_project_to_file(self._selected_project.project)
             self.ids.new_task_title.text = ''
             self.ids.new_task_title.focus = False
 
@@ -98,7 +93,7 @@ class MainScreen(Screen):
 
     def on_task_change(self):
         self._selected_project.render_tasks()
-        self._write_project_to_file(self._selected_project.project)
+        #self._write_project_to_file(self._selected_project.project)
         self.update_dynamic_projects()
 
     def on_task_delete(self, task: md.Task):
@@ -141,9 +136,9 @@ class MainScreen(Screen):
         else:
             self.ids.new_project_title.hint_text = "Введите название"
 
-    def _write_project_to_file(self, project: md.Project) -> None:
-        writer = create_writer(project)
-        writer.write_list(project.task_list)
+    #def _write_project_to_file(self, project: md.Project) -> None:
+        #writer = create_writer(project)
+        #writer.write_list(project.task_list)
 
     def _read_all_projects(self) -> []:
         db_connection = db.DatabaseConnection()
@@ -197,8 +192,8 @@ class ProjectListItem(OneLineListItem):
         db_connection.disconnect()
 
     def _task_change_callback(self):
-        writer = create_writer(self.project)
-        writer.write_list(self.project.task_list)
+        #writer = create_writer(self.project)
+        #writer.write_list(self.project.task_list)
         self._main_screen.update_dynamic_projects()
 
     def render_tasks(self):
