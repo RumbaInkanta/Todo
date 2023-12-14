@@ -39,17 +39,6 @@ class Task:
     def change_due_date(self, due_date: date):
         self.due_date = due_date
 
-    def get_as_csv(self):
-        return [ self.title, self.checked, self.due_date, self.description, self.id, self._created_date ]
-
-    @staticmethod
-    def create_from_csv(collection):
-        task = Task(title=collection[0], due_date=date.fromisoformat(collection[2]), description=collection[3])
-        task.checked = str2bool(collection[1])
-        task.id = uuid.UUID(collection[4])
-        task._created_date = date.fromisoformat(collection[5])
-        return task
-
 def merge_task_lists(task_lists: []):
     tasks = []
     

@@ -76,7 +76,6 @@ class MainScreen(Screen):
             db_connection.insert_task(project=self._selected_project.project, task=task)
 
             self._selected_project.render_tasks()
-            #self._write_project_to_file(self._selected_project.project)
             self.ids.new_task_title.text = ''
             self.ids.new_task_title.focus = False
 
@@ -94,7 +93,6 @@ class MainScreen(Screen):
 
     def on_task_change(self):
         self._selected_project.render_tasks()
-        #self._write_project_to_file(self._selected_project.project)
         self.update_dynamic_projects()
 
     def on_task_delete(self, task: md.Task):
@@ -128,10 +126,6 @@ class MainScreen(Screen):
         else:
             self.ids.new_project_title.hint_text = "Введите название"
 
-    #def _write_project_to_file(self, project: md.Project) -> None:
-        #writer = create_writer(project)
-        #writer.write_list(project.task_list)
-
     def _read_all_projects(self) -> []:
         db_connection = db.DatabaseConnection()
         projects = db_connection.get_all_projects()
@@ -156,8 +150,6 @@ class ProjectListItem(OneLineListItem):
         self._main_screen._selected_project = self
 
     def _task_change_callback(self):
-        #writer = create_writer(self.project)
-        #writer.write_list(self.project.task_list)
         self._main_screen.update_dynamic_projects()
 
     def render_tasks(self):
@@ -216,4 +208,3 @@ class TaskCheckbox(IRightBodyTouch, MDCheckbox):
             self._on_change()
             db_connection = db.DatabaseConnection()
             db_connection.update_task_checked(self.active, self._task.id)
-

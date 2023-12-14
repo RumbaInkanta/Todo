@@ -41,26 +41,32 @@ class DatabaseConnection:
             self.create_tables()
 
     def get_all_projects(self):
-        query = "SELECT * FROM projects"
-        projects_data = self.execute_table_query(query)
+        query = """
+            SELECT p.id AS project_id, p.project_title, t.id AS task_id, t.title, t.checked, t.due_date, 
+                t.description, t.created_date
+            FROM projects p
+            LEFT JOIN tasks t ON p.id = t.project_id
+        """
+        data = self.execute_table_query(query)
 
-        projects = []
-        for project_data in projects_data:
-            project_id, project_title = project_data
+        projects_dict = {}
+        for row in data:
+            project_id, project_title, task_id, title, checked, due_date, description, created_date = row
 
-            tasks_data = self.execute_table_query("SELECT * FROM tasks WHERE project_id = ?", (project_id,))
+            if project_id not in projects_dict:
+                projects_dict[project_id] = {'project_title': project_title, 'tasks': []}
 
-            tasks = []
-            for task_data in tasks_data:
-                task_id, title, checked, due_date, description, created_date, _ = task_data
+            if task_id is not None:
                 task = md.Task(id=task_id, title=title, checked=bool(checked), due_date=date.fromisoformat(due_date),
                             description=description, created_date=datetime.strptime(created_date, "%Y-%m-%d").date())
-                tasks.append(task)
+                projects_dict[project_id]['tasks'].append(task)
 
-            project = md.Project(id=project_id, project_title=project_title, task_list=md.TaskList(tasks))
-            projects.append(project)
+        projects = [md.Project(id=proj_id, project_title=proj_data['project_title'], 
+                            task_list=md.TaskList(proj_data['tasks']))
+                    for proj_id, proj_data in projects_dict.items()]
 
         return projects
+
 
     def table_exists(self, table_name):
         query = "SELECT name FROM sqlite_master WHERE type='table' AND name=?;"
