@@ -10,9 +10,11 @@ from kivy.core.window import Window
 from kivymd.uix.list import IRightBodyTouch, OneLineAvatarIconListItem
 from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.uix.label import MDLabel
-from kivymd.uix.button import MDIconButton
+from kivymd.uix.button import MDIconButton, MDFlatButton, MDRaisedButton
+from kivymd.uix.dialog import MDDialog
 from kivy.clock import Clock
 from kivy.clock import mainthread
+
 import model as md
 import keyboard
 import db_connection as db
@@ -26,6 +28,7 @@ class MainScreen(Screen):
         super(MainScreen, self).__init__(**kwargs)
         keyboard.add_hotkey('ctrl+enter', self.on_new_task)
         self._selected_project = None
+        self.delete_project_dialog = None
 
         db.DatabaseConnection().ensure_schema_created()
 
@@ -125,6 +128,34 @@ class MainScreen(Screen):
             item.on_click()
         else:
             self.ids.new_project_title.hint_text = "Введите название"
+    
+    def on_delete_project(self, project: md.Project):
+        project_id = self._selected_project.project.id
+        db_connection = db.DatabaseConnection()
+        db_connection.delete_project(project_id)
+        self.ids.projects.clear_widgets()
+        self.ids.tasks.clear_widgets()
+        self.fill_data()
+    
+    def show_delete_project_dialog(self):
+        self.delete_project_dialog = MDDialog(
+            text="Вы уверены, что хотите удалить проект и все его задачи?",
+            buttons=[
+                MDFlatButton(
+                    text="Отмена",
+                    on_release=lambda *args: self.delete_project_dialog.dismiss()
+                ),
+                MDRaisedButton(
+                    text="Подтвердить",
+                    on_release=lambda *args: self.delete_project_dialog_callback()
+                ),
+            ],
+        )
+        self.delete_project_dialog.open()
+    
+    def delete_project_dialog_callback(self):
+        self.on_delete_project(self._selected_project)
+        self.delete_project_dialog.dismiss()
 
     def _read_all_projects(self) -> []:
         db_connection = db.DatabaseConnection()
@@ -148,6 +179,8 @@ class ProjectListItem(OneLineListItem):
 
     def _set_current_project(self):
         self._main_screen._selected_project = self
+        self._main_screen.ids.delete_project_button.opacity = 1.0
+        self._main_screen.ids.delete_project_button.disabled = self._is_dynamic
 
     def _task_change_callback(self):
         self._main_screen.update_dynamic_projects()

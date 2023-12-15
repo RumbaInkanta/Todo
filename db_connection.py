@@ -122,3 +122,9 @@ class DatabaseConnection:
     def delete_task(self, task_id):
         query = "DELETE FROM tasks WHERE id = ?"
         self.execute_non_query(query, (task_id,))
+    
+    def delete_project(self, project_id):
+        query = "DELETE FROM tasks WHERE project_id = ?"
+        self.execute_non_query(query, (project_id,))
+        query = "DELETE FROM projects WHERE id = ?"
+        self.execute_non_query(query, (project_id,))

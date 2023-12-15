@@ -69,12 +69,19 @@ ScreenManager:
                         id: tasks
         MDBoxLayout:
             size_hint: 1, .1
+            padding: 10
             MDLabel:
                 id: datetime_label
-                padding: 10
                 size_hint_y: None
                 height: 50
                 theme_text_color: 'Secondary'
+            MDIconButton:
+                id: delete_project_button
+                icon: 'delete'
+                on_release: root.show_delete_project_dialog()
+                opacity: 0.0
+                disabled: True
+                pos_hint: {'center_x': 1, 'center_y': .5}
 
 <TaskEditScreen>:
     MDBoxLayout:
