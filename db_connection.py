@@ -113,7 +113,7 @@ class DatabaseConnection:
 
     def update_task(self, task_id, title, checked, due_date, description, project_id):
         query = "UPDATE tasks SET title = ?, checked = ?, due_date = ?, description = ?, project_id = ? WHERE id = ?"
-        self.execute_non_query(query, (title, checked, due_date, description, project_id, task_id))
+        self.execute_non_query(query, (title, checked, due_date, description, str(project_id), str(task_id)))
 
     def update_task_checked(self, checked, task_id):
         query = "UPDATE tasks SET checked = ? WHERE id = ?"

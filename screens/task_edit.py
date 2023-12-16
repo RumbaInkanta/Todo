@@ -3,6 +3,7 @@ from kivymd.uix.pickers import MDDatePicker
 from kivymd.uix.button import MDRaisedButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton, MDFillRoundFlatIconButton
+from kivymd.uix.selectioncontrol import MDCheckbox
 from screens.main import TaskListItem, MainScreen
 import model as md
 import db_connection as db
@@ -12,13 +13,14 @@ from datetime import date
 class TaskEditScreen(Screen):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.confirmation_dialog = None 
+        self.confirmation_dialog = None
 
     def set_task(self, task: md.Task):
         self._task = task
         self.ids.edit_task_title.text = task.title
         self.ids.edit_task_description.text = task.description
         self.ids.edit_task_due_date.text = str(task.due_date)
+        self.ids.chb_single.active = True
     
     def show_date_picker(self):
         date_dialog = MDDatePicker()

@@ -18,22 +18,15 @@ from screens.task_edit import TaskEditScreen
 
 class TodoApp(MDApp):
 
-    kv_loaded = False
+    def build(self):
+        Builder.load_file('todo.kv')
+        return super().build()
 
     def on_start(self):
-        if not self.kv_loaded:
-            Builder.load_file('todo.kv')
-            self.kv_loaded = True
-
         self.theme_cls.theme_style = 'Dark'
         self.theme_cls.primary_palette = 'LightGreen'
         self.title = "Река времени"
         self.root.get_screen('main').fill_data()
-
-
-
-
-
 
 if __name__ == '__main__':
         

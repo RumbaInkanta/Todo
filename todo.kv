@@ -3,6 +3,7 @@
     orientation: 'horizontal'
     size_hint_y: None
     height: '72dp'
+
 ScreenManager:
     MainScreen:
         name: 'main'
@@ -13,7 +14,7 @@ ScreenManager:
     MDBoxLayout:
         orientation: 'vertical'
         MDBoxLayout:
-            size_hint: 1, .1        
+            size_hint: 1, .1
             MDBoxLayout:
                 size_hint: .3, 1
                 padding: [10, 5, 5, 0]
@@ -60,8 +61,6 @@ ScreenManager:
                     size_hint_y: 0.3
                     MDList:
                         id: dynamic_projects
-                        
-
             MDBoxLayout:
                 size_hint: .7, 1
                 MDScrollView:
@@ -88,7 +87,7 @@ ScreenManager:
         orientation: 'vertical'
         MDBoxLayout: 
             padding: 10
-            size_hint: 1, .1        
+            size_hint: 1, .1
             MDRoundFlatIconButton:
                 icon: 'arrow-left'
                 pos_hint: {'x': 0, 'top': 1}
@@ -98,7 +97,7 @@ ScreenManager:
                 halign: 'center'
                 text: "Изменить задачу"
         MDBoxLayout:
-            padding: 30
+            padding: 20
             orientation: 'vertical'
             size_hint: 1, .9
             MDTextField:
@@ -126,6 +125,66 @@ ScreenManager:
                     icon: 'calendar'
                     text: "Изменить дату"
                     on_release: root.show_date_picker()
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    MDLabel:
+                        text: "Периодичность задачи"
+                        halign: 'center'
+                        valign: 'top'
+                    MDBoxLayout:
+                        MDBoxLayout:
+                            orientation: 'vertical' # Расстояние между MDLabel и MDCheckbox
+                            MDLabel:
+                                text: 'Разово'
+                                halign: 'center'
+                                valign: 'center'
+                                theme_text_color: 'Secondary'
+                            MDCheckbox:
+                                id: chb_single
+                                group: 'Periodicity'
+                                size: "48dp", "48dp"
+                                size_hint: None, None
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+                        MDBoxLayout:
+                            orientation: 'vertical'
+                            MDLabel:
+                                text: 'Еженедельно'
+                                halign: 'center'
+                                valign: 'center'
+                                theme_text_color: 'Secondary'
+                            MDCheckbox:
+                                id: chb_week
+                                group: 'Periodicity'
+                                size: "48dp", "48dp"
+                                size_hint: None, None
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+                        MDBoxLayout:
+                            orientation: 'vertical'
+                            MDLabel:
+                                text: 'Ежемесячно'
+                                halign: 'center'
+                                valign: 'center'
+                                theme_text_color: 'Secondary'
+                            MDCheckbox:
+                                id: chb_month
+                                group: 'Periodicity'
+                                size: "48dp", "48dp"
+                                size_hint: None, None
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+                        MDBoxLayout:
+                            orientation: 'vertical'
+                            MDLabel:
+                                text: 'Ежеквартально'
+                                halign: 'center'
+                                valign: 'center'
+                                theme_text_color: 'Secondary'
+                            MDCheckbox:
+                                id: chb_quarter
+                                group: 'Periodicity'
+                                size: "48dp", "48dp"
+                                size_hint: None, None
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+
             MDBoxLayout:
                 size_hint: 1, .2
                 padding: 10
@@ -135,7 +194,7 @@ ScreenManager:
                     text: "Удалить задачу"
                     on_release: root.show_confirmation_dialog()
                 MDBoxLayout:
-                    size_hint: .2, 1                    
+                    size_hint: .2, 1
                 MDFillRoundFlatIconButton:
                     size_hint: .4, 1
                     icon: 'check-bold'
