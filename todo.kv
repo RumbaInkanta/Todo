@@ -96,6 +96,12 @@ ScreenManager:
             MDLabel:
                 halign: 'center'
                 text: "Изменить задачу"
+            MDCheckbox:
+                id: chb_checked
+                size: "48dp", "48dp"
+                size_hint: None, None
+                color_inactive: 'green'
+                on_active: root.on_task_active()
         MDBoxLayout:
             padding: 20
             orientation: 'vertical'

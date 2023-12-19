@@ -20,14 +20,16 @@ class TaskEditScreen(Screen):
         self.ids.edit_task_title.text = task.title
         self.ids.edit_task_description.text = task.description
         self.ids.edit_task_due_date.text = str(task.due_date)
-        if task.period == 0:
-            self.ids.chb_single.active = True
-        if task.period == 1:
-            self.ids.chb_week.active = True
-        if task.period == 2:
-            self.ids.chb_month.active = True
-        if task.period == 3:
-            self.ids.chb_quarter.active = True       
+        checkbox_mapping = {
+            0: 'chb_single',
+            1: 'chb_week',
+            2: 'chb_month',
+            3: 'chb_quarter',
+        }
+        selected_checkbox_id = checkbox_mapping.get(task.period, 'chb_single')
+        self.ids[selected_checkbox_id].active = True
+        self.ids.chb_checked.active = task.checked
+
     
     def show_date_picker(self):
         date_dialog = MDDatePicker()
@@ -62,13 +64,16 @@ class TaskEditScreen(Screen):
         period_mapping = {'chb_single': 0, 'chb_week': 1, 'chb_month': 2, 'chb_quarter': 3}
         self._task.period = period_mapping.get(checkbox_id, 0)
 
+    def on_task_active(self):
+        self._task.checked = self.ids.chb_checked.active
+
     def change_task(self):
         self._task.title = self.ids.edit_task_title.text
         self._task.description = self.ids.edit_task_description.text
-        self._task.due_date = date.fromisoformat(self.ids.edit_task_due_date.text)        
+        self._task.due_date = date.fromisoformat(self.ids.edit_task_due_date.text)
 
         db_connection = db.DatabaseConnection()
-        db_connection.update_task(self._task.id, self._task.title, 0, self._task.due_date, self._task.description, self._task.period, self.get_main_screen()._selected_project.project.id)
+        db_connection.update_task(self._task.id, self._task.title, self._task.checked, self._task.due_date, self._task.description, self._task.period, self.get_main_screen()._selected_project.project.id)
         
         self.get_main_screen().on_task_change()
         
