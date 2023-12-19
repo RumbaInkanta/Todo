@@ -146,6 +146,7 @@ ScreenManager:
                                 size_hint: None, None
                                 pos_hint: {'center_x': .5, 'center_y': .5}
                                 radio_icon_normal: 'black'
+                                on_active: root.update_period(self, 'chb_single')
                         MDBoxLayout:
                             orientation: 'vertical'
                             MDLabel:
@@ -160,6 +161,7 @@ ScreenManager:
                                 size_hint: None, None
                                 pos_hint: {'center_x': .5, 'center_y': .5}
                                 radio_icon_normal: 'black'
+                                on_active: root.update_period(self, 'chb_week')
                         MDBoxLayout:
                             orientation: 'vertical'
                             MDLabel:
@@ -174,6 +176,7 @@ ScreenManager:
                                 size_hint: None, None
                                 pos_hint: {'center_x': .5, 'center_y': .5}
                                 radio_icon_normal: 'black'
+                                on_active: root.update_period(self, 'chb_month')
                         MDBoxLayout:
                             orientation: 'vertical'
                             MDLabel:
@@ -188,6 +191,7 @@ ScreenManager:
                                 size_hint: None, None
                                 pos_hint: {'center_x': .5, 'center_y': .5}
                                 radio_icon_normal: 'black'
+                                on_active: root.update_period(self, 'chb_quarter')
             MDBoxLayout:
                 size_hint: 1, .2
                 padding: 10

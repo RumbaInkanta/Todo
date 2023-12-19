@@ -43,7 +43,7 @@ class DatabaseConnection:
     def get_all_projects(self):
         query = """
             SELECT p.id AS project_id, p.project_title, t.id AS task_id, t.title, t.checked, t.due_date, 
-                t.description, t.created_date
+                t.description, t.created_date, t.period
             FROM projects p
             LEFT JOIN tasks t ON p.id = t.project_id
         """
@@ -51,14 +51,14 @@ class DatabaseConnection:
 
         projects_dict = {}
         for row in data:
-            project_id, project_title, task_id, title, checked, due_date, description, created_date = row
+            project_id, project_title, task_id, title, checked, due_date, description, created_date, period = row
 
             if project_id not in projects_dict:
                 projects_dict[project_id] = {'project_title': project_title, 'tasks': []}
 
             if task_id is not None:
                 task = md.Task(id=task_id, title=title, checked=bool(checked), due_date=date.fromisoformat(due_date),
-                            description=description, created_date=datetime.strptime(created_date, "%Y-%m-%d").date())
+                            description=description, created_date=datetime.strptime(created_date, "%Y-%m-%d").date(), period = period)
                 projects_dict[project_id]['tasks'].append(task)
 
         projects = [md.Project(id=proj_id, project_title=proj_data['project_title'], 
@@ -88,6 +88,7 @@ class DatabaseConnection:
                 due_date TEXT,
                 description TEXT,
                 created_date TEXT,
+                period INTEGER,
                 project_id TEXT,
                 FOREIGN KEY (project_id) REFERENCES projects (id),
                 CONSTRAINT id_unique UNIQUE (id)
@@ -104,16 +105,16 @@ class DatabaseConnection:
         task_id = str(task.id)
         created_date = str(task.created_date)
         project_id = str(project.id)
-        query = "INSERT INTO tasks (id, title, checked, due_date, description, created_date, project_id) VALUES (?, ?, ?, ?, ?, ?, ?)"
-        self.execute_non_query(query, (task_id, task.title, task.checked, task.due_date, task.description, created_date, project_id))
+        query = "INSERT INTO tasks (id, title, checked, due_date, description, created_date, period, project_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        self.execute_non_query(query, (task_id, task.title, task.checked, task.due_date, task.description, created_date, task.period, project_id))
     
     def update_project(self, project_id, new_project_title):
         query = "UPDATE projects SET project_title = ? WHERE id = ?"
         self.execute_non_query(query, (new_project_title, project_id))
 
-    def update_task(self, task_id, title, checked, due_date, description, project_id):
-        query = "UPDATE tasks SET title = ?, checked = ?, due_date = ?, description = ?, project_id = ? WHERE id = ?"
-        self.execute_non_query(query, (title, checked, due_date, description, str(project_id), str(task_id)))
+    def update_task(self, task_id, title, checked, due_date, description, period, project_id):
+        query = "UPDATE tasks SET title = ?, checked = ?, due_date = ?, description = ?, period = ?, project_id = ? WHERE id = ?"
+        self.execute_non_query(query, (title, checked, due_date, description, period, str(project_id), str(task_id)))
 
     def update_task_checked(self, checked, task_id):
         query = "UPDATE tasks SET checked = ? WHERE id = ?"

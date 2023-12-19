@@ -20,7 +20,14 @@ class TaskEditScreen(Screen):
         self.ids.edit_task_title.text = task.title
         self.ids.edit_task_description.text = task.description
         self.ids.edit_task_due_date.text = str(task.due_date)
-        self.ids.chb_single.active = True
+        if task.period == 0:
+            self.ids.chb_single.active = True
+        if task.period == 1:
+            self.ids.chb_week.active = True
+        if task.period == 2:
+            self.ids.chb_month.active = True
+        if task.period == 3:
+            self.ids.chb_quarter.active = True       
     
     def show_date_picker(self):
         date_dialog = MDDatePicker()
@@ -51,13 +58,17 @@ class TaskEditScreen(Screen):
         self.switch_to_main()
         self.confirmation_dialog.dismiss()
 
+    def update_period(self, checkbox, checkbox_id):
+        period_mapping = {'chb_single': 0, 'chb_week': 1, 'chb_month': 2, 'chb_quarter': 3}
+        self._task.period = period_mapping.get(checkbox_id, 0)
+
     def change_task(self):
         self._task.title = self.ids.edit_task_title.text
         self._task.description = self.ids.edit_task_description.text
-        self._task.due_date = date.fromisoformat(self.ids.edit_task_due_date.text)
-        
+        self._task.due_date = date.fromisoformat(self.ids.edit_task_due_date.text)        
+
         db_connection = db.DatabaseConnection()
-        db_connection.update_task(self._task.id, self._task.title, 0, self._task.due_date, self._task.description, self.get_main_screen()._selected_project.project.id)
+        db_connection.update_task(self._task.id, self._task.title, 0, self._task.due_date, self._task.description, self._task.period, self.get_main_screen()._selected_project.project.id)
         
         self.get_main_screen().on_task_change()
         
