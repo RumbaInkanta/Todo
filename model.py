@@ -73,7 +73,7 @@ class TaskList:
         self.add(task)
         return task
 
-    def add_period_task(self, title: str, due_date: date, description='', checked=False, created_date=date.today(), period = 0,) -> Task:
+    def add_period_task(self, title: str, due_date: date, description='', checked=False, created_date=date.today(), period = 0) -> Task:
         task = Task(title, due_date, description, checked, created_date, period)
         self.add(task)
         return task

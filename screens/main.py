@@ -101,11 +101,11 @@ class MainScreen(Screen):
 
     def set_period_task(self, project: md.Project, task: md.Task):
         self._task = task
-        if self._task.period == 1 and self._task.checked == True:
+        if self._task.period == 1 and self._task.checked:
             new_task_due_date = self._task.due_date + relativedelta(weeks=1)
-        elif self._task.period == 2 and self._task.checked == True:
+        elif self._task.period == 2 and self._task.checked:
             new_task_due_date = self._task.due_date + relativedelta(months=1)
-        elif self._task.period == 3 and self._task.checked == True:
+        elif self._task.period == 3 and self._task.checked:
             new_task_due_date = self._task.due_date + relativedelta(months=3)
         else:
             return
@@ -153,6 +153,13 @@ class MainScreen(Screen):
             item.on_click()
         else:
             self.ids.new_project_title.hint_text = "Введите название"
+
+    def _set_current_project(self, item):
+        self._selected_project = item
+        self.ids.delete_project_button.opacity = 1.0
+        self.ids.delete_project_button.disabled = item is None or item._is_dynamic 
+        self.ids.new_task_title.disabled = item is None or item._is_dynamic
+        self.ids.new_task_button.disabled = item is None or item._is_dynamic
     
     def on_delete_project(self, project: md.Project):
         project_id = self._selected_project.project.id
@@ -160,6 +167,7 @@ class MainScreen(Screen):
         db_connection.delete_project(project_id)
         self.ids.projects.clear_widgets()
         self.ids.tasks.clear_widgets()
+        self._set_current_project(None)
         self.fill_data()
     
     def show_delete_project_dialog(self):
@@ -197,18 +205,14 @@ class ProjectListItem(OneLineListItem):
         self._is_dynamic = is_dynamic
 
     def on_click(self):
-        self._set_current_project()
+        self._main_screen._set_current_project(self)
         self.render_tasks()
-        self._main_screen.ids.new_task_title.disabled = self._is_dynamic
-        self._main_screen.ids.new_task_button.disabled = self._is_dynamic
 
-    def _set_current_project(self):
-        self._main_screen._selected_project = self
-        self._main_screen.ids.delete_project_button.opacity = 1.0
-        self._main_screen.ids.delete_project_button.disabled = self._is_dynamic
-
-    def _task_change_callback(self):
-        self._main_screen.update_dynamic_projects()
+    def _task_change_callback(self, task: md.Task):
+        self._main_screen.set_period_task(self._main_screen._selected_project,task)
+        db_connection = db.DatabaseConnection()
+        db_connection.update_task_checked(task.checked, task.id)
+        self._main_screen.on_task_change()
 
     def render_tasks(self):
         self._task_list_container.clear_widgets()
@@ -233,7 +237,7 @@ class TaskListItem(BoxLayout):
         self._main_screen = main_screen
         
         if not is_dynamic:
-            self.add_widget(TaskCheckbox(task=task, main_screen=main_screen, on_change=on_change, disabled=is_dynamic, width='48dp', size_hint=(.15,1)))
+            self.add_widget(TaskCheckbox(task=task, on_change=on_change, disabled=is_dynamic, width='48dp', size_hint=(.15,1)))
 
         self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description, on_press=self.switch_to_edit))
         
@@ -252,20 +256,15 @@ class TaskCheckbox(IRightBodyTouch, MDCheckbox):
 
     _on_change = None
     
-    def __init__(self, task: md.Task, main_screen: MainScreen, on_change=None, *args, **kwargs):
+    def __init__(self, task: md.Task, on_change=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._task = task
         self.active = task.checked
         self._on_change = on_change
-        self._main_screen = main_screen
 
     def on_active(self, *args) -> None:
         super().on_active(*args)
         self._task.checked = self.active
 
         if self._on_change:
-            self._main_screen.set_period_task(self._main_screen._selected_project,self._task)
-            self._on_change()
-            db_connection = db.DatabaseConnection()
-            db_connection.update_task_checked(self.active, self._task.id)
-            self._main_screen.on_task_change()
+            self._on_change(self._task)
