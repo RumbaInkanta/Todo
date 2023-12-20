@@ -75,8 +75,8 @@ class TaskEditScreen(Screen):
         db_connection = db.DatabaseConnection()
         db_connection.update_task(self._task.id, self._task.title, self._task.checked, self._task.due_date, self._task.description, self._task.period, self.get_main_screen()._selected_project.project.id)
         
+        self.get_main_screen().set_period_task(self.get_main_screen()._selected_project, self._task)
         self.get_main_screen().on_task_change()
-        
         self.switch_to_main()
     
     def cancel_click(self):

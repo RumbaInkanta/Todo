@@ -12,6 +12,7 @@ from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDIconButton, MDFlatButton, MDRaisedButton
 from kivymd.uix.dialog import MDDialog
+from dateutil.relativedelta import relativedelta
 from kivy.clock import Clock
 from kivy.clock import mainthread
 
@@ -97,6 +98,30 @@ class MainScreen(Screen):
     def on_task_change(self):
         self._selected_project.render_tasks()
         self.update_dynamic_projects()
+
+    def set_period_task(self, project: md.Project, task: md.Task):
+        self._task = task
+        if self._task.period == 1 and self._task.checked == True:
+            new_task_due_date = self._task.due_date + relativedelta(weeks=1)
+        elif self._task.period == 2 and self._task.checked == True:
+            new_task_due_date = self._task.due_date + relativedelta(months=1)
+        elif self._task.period == 3 and self._task.checked == True:
+            new_task_due_date = self._task.due_date + relativedelta(months=3)
+        else:
+            return
+
+        new_task = self._selected_project.project.task_list.add_period_task(
+            self._task.title,
+            new_task_due_date,
+            self._task.description,
+            False,
+            date.today(),
+            self._task.period
+        )
+
+        db_connection = db.DatabaseConnection()
+        db_connection.insert_task(project=self._selected_project.project, task=new_task)
+        self.on_task_change()
 
     def on_task_delete(self, task: md.Task):
         removed = self._selected_project.project.task_list.remove(task.id)
@@ -208,7 +233,7 @@ class TaskListItem(BoxLayout):
         self._main_screen = main_screen
         
         if not is_dynamic:
-            self.add_widget(TaskCheckbox(task=task, on_change=on_change, disabled=is_dynamic, width='48dp', size_hint=(.15,1)))
+            self.add_widget(TaskCheckbox(task=task, main_screen=main_screen, on_change=on_change, disabled=is_dynamic, width='48dp', size_hint=(.15,1)))
 
         self.add_widget(TwoLineListItem(text=task.title, secondary_text=task.description, on_press=self.switch_to_edit))
         
@@ -227,17 +252,20 @@ class TaskCheckbox(IRightBodyTouch, MDCheckbox):
 
     _on_change = None
     
-    def __init__(self, task: md.Task, on_change=None, *args, **kwargs):
+    def __init__(self, task: md.Task, main_screen: MainScreen, on_change=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._task = task
         self.active = task.checked
         self._on_change = on_change
+        self._main_screen = main_screen
 
     def on_active(self, *args) -> None:
         super().on_active(*args)
         self._task.checked = self.active
 
         if self._on_change:
+            self._main_screen.set_period_task(self._main_screen._selected_project,self._task)
             self._on_change()
             db_connection = db.DatabaseConnection()
             db_connection.update_task_checked(self.active, self._task.id)
+            self._main_screen.on_task_change()

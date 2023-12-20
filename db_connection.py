@@ -107,10 +107,10 @@ class DatabaseConnection:
         project_id = str(project.id)
         query = "INSERT INTO tasks (id, title, checked, due_date, description, created_date, period, project_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         self.execute_non_query(query, (task_id, task.title, task.checked, task.due_date, task.description, created_date, task.period, project_id))
-    
+        
     def update_project(self, project_id, new_project_title):
         query = "UPDATE projects SET project_title = ? WHERE id = ?"
-        self.execute_non_query(query, (new_project_title, project_id))
+        self.execute_non_query(query, (new_project_title, str(project_id)))
 
     def update_task(self, task_id, title, checked, due_date, description, period, project_id):
         query = "UPDATE tasks SET title = ?, checked = ?, due_date = ?, description = ?, period = ?, project_id = ? WHERE id = ?"
@@ -122,10 +122,10 @@ class DatabaseConnection:
     
     def delete_task(self, task_id):
         query = "DELETE FROM tasks WHERE id = ?"
-        self.execute_non_query(query, (task_id,))
+        self.execute_non_query(query, (str(task_id),))
     
     def delete_project(self, project_id):
         query = "DELETE FROM tasks WHERE project_id = ?"
-        self.execute_non_query(query, (project_id,))
+        self.execute_non_query(query, (str(project_id),))
         query = "DELETE FROM projects WHERE id = ?"
-        self.execute_non_query(query, (project_id,))
+        self.execute_non_query(query, (str(project_id),))
