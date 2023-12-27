@@ -11,6 +11,12 @@ ScreenManager:
         name: 'task_edit'
 
 <MainScreen>:
+    canvas.before:
+        Color:
+            rgba: 0/255, 38/255, 22/255, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
     MDBoxLayout:
         orientation: 'vertical'
         MDBoxLayout:
@@ -83,6 +89,12 @@ ScreenManager:
                 pos_hint: {'center_x': 1, 'center_y': .5}
 
 <TaskEditScreen>:
+    canvas.before:
+        Color:
+            rgba: 0/255, 38/255, 22/255, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
     MDBoxLayout:
         orientation: 'vertical'
         MDBoxLayout: 

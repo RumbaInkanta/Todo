@@ -24,7 +24,7 @@ class TodoApp(MDApp):
 
     def on_start(self):
         self.theme_cls.theme_style = 'Dark'
-        self.theme_cls.primary_palette = 'LightGreen'
+        self.theme_cls.primary_palette = 'Orange'
         self.title = "Река времени"
         self.root.get_screen('main').fill_data()
 
