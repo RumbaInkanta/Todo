@@ -2,10 +2,18 @@ import sqlite3
 import uuid
 from datetime import date, datetime
 import model as md
+import cipher
+import binascii
+import hashlib
 
 class DatabaseConnection:
     def __init__(self, db_name='tasks.db'):
         self.db_name = db_name
+        self._password = "secureKey"
+        text_bytes = self._password.encode('utf-8')
+        hash_object = hashlib.sha256()
+        hash_object.update(text_bytes)
+        self._key = hash_object.digest()
 
     def execute_non_query(self, query, parameters = None):
         self._execute_query(query=query, reader_func=None, commit=True, parameters=parameters)
@@ -15,7 +23,7 @@ class DatabaseConnection:
 
     def execute_table_query(self, query, parameters = None):
         return self._execute_query(query=query, reader_func=lambda cur: cur.fetchall(), commit=False, parameters=parameters)
-
+    
     def _execute_query(self, query, reader_func, commit: bool, parameters):
         with sqlite3.connect(self.db_name) as connection:
             
@@ -54,11 +62,11 @@ class DatabaseConnection:
             project_id, project_title, task_id, title, checked, due_date, description, created_date, period = row
 
             if project_id not in projects_dict:
-                projects_dict[project_id] = {'project_title': project_title, 'tasks': []}
+                projects_dict[project_id] = {'project_title': cipher.decrypt(project_title, self._key), 'tasks': []}
 
             if task_id is not None:
-                task = md.Task(id=task_id, title=title, checked=bool(checked), due_date=date.fromisoformat(due_date),
-                            description=description, created_date=datetime.strptime(created_date, "%Y-%m-%d").date(), period = period)
+                task = md.Task(id=task_id, title=cipher.decrypt(title, self._key), checked=bool(checked), due_date=date.fromisoformat(cipher.decrypt(due_date, self._key)),
+                            description=cipher.decrypt(description, self._key), created_date=datetime.strptime(cipher.decrypt(created_date, self._key), "%Y-%m-%d").date(), period = period)
                 projects_dict[project_id]['tasks'].append(task)
 
         projects = [md.Project(id=proj_id, project_title=proj_data['project_title'], 
@@ -99,22 +107,32 @@ class DatabaseConnection:
 
     def insert_project(self, project: md.Project):
         query = "INSERT INTO projects (id, project_title) VALUES (?, ?)"
-        self.execute_non_query(query, (str(project.id), project.project_title))
+        title_project = cipher.encrypt(project.project_title, self._key)
+        self.execute_non_query(query, (str(project.id), title_project))
 
     def insert_task(self, project: md.Project, task: md.Task):
         task_id = str(task.id)
         created_date = str(task.created_date)
         project_id = str(project.id)
         query = "INSERT INTO tasks (id, title, checked, due_date, description, created_date, period, project_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
-        self.execute_non_query(query, (task_id, task.title, task.checked, task.due_date, task.description, created_date, task.period, project_id))
+
+        title = cipher.encrypt(task.title, self._key)
+        due_date = cipher.encrypt(str(task.due_date), self._key)
+        description = cipher.encrypt(task.description, self._key)
+        created = cipher.encrypt(created_date, self._key)
+        self.execute_non_query(query, (task_id, title, task.checked, due_date, description, created, task.period, project_id))
         
     def update_project(self, project_id, new_project_title):
         query = "UPDATE projects SET project_title = ? WHERE id = ?"
-        self.execute_non_query(query, (new_project_title, str(project_id)))
+        title_project = cipher.encrypt(new_project_title, self._key)
+        self.execute_non_query(query, (title_project, str(project_id)))
 
     def update_task(self, task_id, title, checked, due_date, description, period, project_id):
         query = "UPDATE tasks SET title = ?, checked = ?, due_date = ?, description = ?, period = ?, project_id = ? WHERE id = ?"
-        self.execute_non_query(query, (title, checked, due_date, description, period, str(project_id), str(task_id)))
+        new_title = cipher.encrypt(title, self._key)
+        new_due_date = cipher.encrypt(str(due_date), self._key)
+        new_description = cipher.encrypt(description, self._key)
+        self.execute_non_query(query, (new_title, checked, new_due_date, new_description, period, str(project_id), str(task_id)))
 
     def update_task_checked(self, checked, task_id):
         query = "UPDATE tasks SET checked = ? WHERE id = ?"

@@ -13,6 +13,8 @@ from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.uix.button import MDIconButton
 from screens.main import MainScreen
 from screens.task_edit import TaskEditScreen
+from screens.calendar import CalendarScreen
+
 
 
 

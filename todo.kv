@@ -9,6 +9,13 @@ ScreenManager:
         name: 'main'
     TaskEditScreen:
         name: 'task_edit'
+    CalendarScreen:
+        name: 'calendar'
+
+#
+#######################################################################
+#######################################################################
+#
 
 <MainScreen>:
     canvas.before:
@@ -80,6 +87,10 @@ ScreenManager:
                 size_hint_y: None
                 height: 50
                 theme_text_color: 'Secondary'
+
+            MDIconButton:
+                icon: 'calendar'
+                on_release: root.open_calendar()
             MDIconButton:
                 id: delete_project_button
                 icon: 'delete'
@@ -87,7 +98,10 @@ ScreenManager:
                 opacity: 0.0
                 disabled: True
                 pos_hint: {'center_x': 1, 'center_y': .5}
-
+#
+#######################################################################
+#######################################################################
+#
 <TaskEditScreen>:
     canvas.before:
         Color:
@@ -225,3 +239,33 @@ ScreenManager:
                     icon: 'check-bold'
                     text: 'Изменить задачу'
                     on_press: root.change_task()
+
+#
+#######################################################################
+#######################################################################
+#
+
+<CalendarScreen>:
+    canvas.before:
+        Color:
+            rgba: 0/255, 38/255, 22/255, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    MDBoxLayout:
+        orientation: 'vertical'
+
+        MDTabs:
+            id: tabs
+            on_tab_switch: root.on_tab_switch(*args)
+        MDRoundFlatIconButton:
+            icon: 'arrow-left'
+            pos_hint: {'x': 0, 'top': 1}
+            text: 'Назад'
+            on_release: root.switch_to_main()
+<Tab>
+    GridLayout:
+        id: calendar_layout
+        cols: 7
+        rows: 8
+        spacing: 5

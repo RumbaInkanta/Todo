@@ -1,2 +1,2 @@
 Dependencies
-pip install python-dateutil db-sqlite3
+pip install python-dateutil db-sqlite3 cryptography
