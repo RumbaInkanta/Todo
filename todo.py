@@ -14,7 +14,7 @@ from kivymd.uix.button import MDIconButton
 from screens.main import MainScreen
 from screens.task_edit import TaskEditScreen
 from screens.calendar import CalendarScreen
-
+from screens.auth import AuthScreen
 
 
 
@@ -28,6 +28,7 @@ class TodoApp(MDApp):
         self.theme_cls.theme_style = 'Dark'
         self.theme_cls.primary_palette = 'Orange'
         self.title = "Река времени"
+        self.root.current = 'auth'
         self.root.get_screen('main').fill_data()
 
 if __name__ == '__main__':

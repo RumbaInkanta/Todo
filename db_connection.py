@@ -6,6 +6,7 @@ import cipher
 import binascii
 import hashlib
 
+
 class DatabaseConnection:
     def __init__(self, db_name='tasks.db'):
         self.db_name = db_name

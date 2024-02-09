@@ -44,12 +44,11 @@ class MainScreen(Screen):
 
     def open_edit(self):
         self.manager.current = 'task_edit'
-    
+
     def open_calendar(self, *args):
         calendar_screen = self.manager.get_screen('calendar')
         calendar_screen.on_start_calendar()
-        self.manager.current = 'calendar'
-        
+        self.manager.current = 'calendar' 
 
     def update_dynamic_projects(self):
         today_lists = []
