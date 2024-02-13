@@ -8,10 +8,9 @@ import hashlib
 
 
 class DatabaseConnection:
-    def __init__(self, db_name='tasks.db'):
+    def __init__(self, password, db_name='tasks.db'):
         self.db_name = db_name
-        self._password = "secureKey"
-        text_bytes = self._password.encode('utf-8')
+        text_bytes = password.encode('utf-8')
         hash_object = hashlib.sha256()
         hash_object.update(text_bytes)
         self._key = hash_object.digest()

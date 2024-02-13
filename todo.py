@@ -29,7 +29,6 @@ class TodoApp(MDApp):
         self.theme_cls.primary_palette = 'Orange'
         self.title = "Река времени"
         self.root.current = 'auth'
-        self.root.get_screen('main').fill_data()
 
 if __name__ == '__main__':
         

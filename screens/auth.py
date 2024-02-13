@@ -7,9 +7,8 @@ class AuthScreen(Screen):
 
     def auth(self):
         pw = self.ids.auth_text_field.text
-        db_connection = db.DatabaseConnection()
-        
-        if pw == '000':
-            self.manager.current = 'main'
-        else:
-            self.ids.true_label.text = 'Введен неверный пароль, попробуйте снова:'
+        db_connection = db.DatabaseConnection(password=pw)
+        main_screen = self.manager.get_screen('main')
+        main_screen.set_dbconnection(db_connection)
+        main_screen.fill_data()
+        self.manager.current = 'main'

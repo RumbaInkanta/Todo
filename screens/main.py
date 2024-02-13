@@ -31,7 +31,9 @@ class MainScreen(Screen):
         self._selected_project = None
         self.delete_project_dialog = None
 
-        db.DatabaseConnection().ensure_schema_created()
+    def set_dbconnection(self, db_connection):
+        self.db_connection = db_connection
+        self.db_connection.ensure_schema_created()
 
     def fill_data(self):
         self.projects = self._read_all_projects()
@@ -81,8 +83,7 @@ class MainScreen(Screen):
             
             task = self._selected_project.project.task_list.add_task(txt, due=date.today(), description=descr)
 
-            db_connection = db.DatabaseConnection()            
-            db_connection.insert_task(project=self._selected_project.project, task=task)
+            self.db_connection.insert_task(project=self._selected_project.project, task=task)
 
             self._selected_project.render_tasks()
             self.ids.new_task_title.text = ''
@@ -124,8 +125,7 @@ class MainScreen(Screen):
             self._task.period
         )
 
-        db_connection = db.DatabaseConnection()
-        db_connection.insert_task(project=self._selected_project.project, task=new_task)
+        self.db_connection.insert_task(project=self._selected_project.project, task=new_task)
         self.on_task_change()
 
     def on_task_delete(self, task: md.Task):
@@ -135,8 +135,7 @@ class MainScreen(Screen):
             print(f'Cannot find task {task.id}')
             return
         
-        db_connection = db.DatabaseConnection()
-        db_connection.delete_task(task.id)
+        self.db_connection.delete_task(task.id)
 
         self.on_task_change()
 
@@ -148,8 +147,7 @@ class MainScreen(Screen):
             
             proj = md.Project(project_title=project_title)
 
-            db_connection = db.DatabaseConnection()
-            db_connection.insert_project(proj)
+            self.db_connection.insert_project(proj)
 
             self.projects.append(proj)
             item = ProjectListItem(proj, main_screen=self, is_dynamic=False, text=proj.project_title, on_release=lambda x: x.on_click())
@@ -168,8 +166,7 @@ class MainScreen(Screen):
     
     def on_delete_project(self, project: md.Project):
         project_id = self._selected_project.project.id
-        db_connection = db.DatabaseConnection()
-        db_connection.delete_project(project_id)
+        self.db_connection.delete_project(project_id)
         self.ids.projects.clear_widgets()
         self.ids.tasks.clear_widgets()
         self._set_current_project(None)
@@ -196,8 +193,7 @@ class MainScreen(Screen):
         self.delete_project_dialog.dismiss()
 
     def _read_all_projects(self) -> []:
-        db_connection = db.DatabaseConnection()
-        projects = db_connection.get_all_projects()
+        projects = self.db_connection.get_all_projects()
         return projects
 
 
@@ -215,8 +211,7 @@ class ProjectListItem(OneLineListItem):
 
     def _task_change_callback(self, task: md.Task):
         self._main_screen.set_period_task(self._main_screen._selected_project,task)
-        db_connection = db.DatabaseConnection()
-        db_connection.update_task_checked(task.checked, task.id)
+        self._main_screen.db_connection.update_task_checked(task.checked, task.id)
         self._main_screen.on_task_change()
 
     def render_tasks(self):
@@ -256,7 +251,6 @@ class TaskListItem(BoxLayout):
         task_edit_screen.set_task(self._task)
         self._main_screen.manager.current = 'task_edit'
     
-
 class TaskCheckbox(IRightBodyTouch, MDCheckbox):
 
     _on_change = None
