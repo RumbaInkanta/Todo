@@ -1,5 +1,6 @@
 *.csv
 *.db
 *.txt
+.venv/*
 __pycache__/*
 screens/__pycache__/*

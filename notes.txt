@@ -1,2 +1,3 @@
 Dependencies
-pip install python-dateutil db-sqlite3 cryptography
+pip install python-dateutil db-sqlite3 cryptography kivymd keyboard
+source .venv/bin/activate
