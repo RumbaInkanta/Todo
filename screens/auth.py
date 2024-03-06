@@ -7,8 +7,11 @@ class AuthScreen(Screen):
 
     def auth(self):
         pw = self.ids.auth_text_field.text
-        db_connection = db.DatabaseConnection(password=pw)
-        main_screen = self.manager.get_screen('main')
-        main_screen.set_dbconnection(db_connection)
-        main_screen.fill_data()
-        self.manager.current = 'main'
+        try:
+            db_connection = db.DatabaseConnection(password=pw)
+            main_screen = self.manager.get_screen('main')
+            main_screen.set_dbconnection(db_connection)
+            main_screen.fill_data()
+            self.manager.current = 'main'
+        except:
+            self.ids.true_label.text = "Введен неправильный пароль, попробуйте снова"

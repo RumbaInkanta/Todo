@@ -21,8 +21,8 @@ import keyboard
 import db_connection as db
 
 
-def path_parse():
-    return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#def path_parse():
+#    return sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 class MainScreen(Screen):
     def __init__(self, **kwargs):

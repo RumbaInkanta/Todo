@@ -27,7 +27,7 @@ class TodoApp(MDApp):
     def on_start(self):
         self.theme_cls.theme_style = 'Dark'
         self.theme_cls.primary_palette = 'Orange'
-        self.title = "Река времени"
+        self.title = "Список задач"
         self.root.current = 'auth'
 
 if __name__ == '__main__':

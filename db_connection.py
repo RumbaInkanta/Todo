@@ -1,9 +1,7 @@
 import sqlite3
-import uuid
 from datetime import date, datetime
 import model as md
 import cipher
-import binascii
 import hashlib
 
 
