@@ -1,8 +1,10 @@
 *.csv
 *.db
-*.txt
+notes.txt
+*.spec
 build/
 venv/
+dist/
 .venv/*
 __pycache__/*
 screens/__pycache__/*

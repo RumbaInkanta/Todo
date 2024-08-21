@@ -1,0 +1,5 @@
+cryptography==43.0.0
+keyboard==0.13.5
+Kivy==2.3.0
+kivymd==1.2.0
+python_dateutil==2.9.0.post0
