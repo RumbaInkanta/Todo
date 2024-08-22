@@ -2,6 +2,7 @@
 *.db
 notes.txt
 *.spec
+.DS_Store
 build/
 venv/
 dist/
