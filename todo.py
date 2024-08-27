@@ -21,7 +21,8 @@ from screens.auth import AuthScreen
 class TodoApp(MDApp):
 
     def build(self):
-        Builder.load_file('todo.kv')
+        kv_file_path = resource_path("todo.kv")
+        Builder.load_file(kv_file_path)
         return super().build()
 
     def on_start(self):
@@ -29,6 +30,14 @@ class TodoApp(MDApp):
         self.theme_cls.primary_palette = 'Orange'
         self.title = "Список задач"
         self.root.current = 'auth'
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    
+    return os.path.join(base_path, relative_path)
 
 if __name__ == '__main__':
         
