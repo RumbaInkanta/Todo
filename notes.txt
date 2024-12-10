@@ -1,3 +1,4 @@
 Dependencies
 pip install python-dateutil db-sqlite3 cryptography kivymd keyboard
 source .venv/bin/activate
+pyinstaller --add-data "screens:screens" --add-data "todo.kv:." --onefile --clean --noconsole todo.py
