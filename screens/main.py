@@ -17,7 +17,6 @@ from kivy.clock import Clock
 from kivy.clock import mainthread
 
 import model as md
-import keyboard
 import db_connection as db
 
 
@@ -27,8 +26,7 @@ import db_connection as db
 class MainScreen(Screen):
     def __init__(self, **kwargs):
         super(MainScreen, self).__init__(**kwargs)
-        keyboard.add_hotkey('ctrl+enter', self.on_new_task)
-        Window.bind(on_key_down = self.on_key_down)
+        #Window.bind(on_key_down = self.on_key_down)
         self._selected_project = None
         self.delete_project_dialog = None
 
@@ -97,9 +95,9 @@ class MainScreen(Screen):
     def schedule_on_new_task(self, *args):
         Clock.schedule_once(self.on_new_task, 0)
 
-    def on_key_down(self, window, key, scancode, codepoint, modifier):
-        if self.ids.new_task_title.focus and self.is_enter_key(key, modifier):
-            self.schedule_on_new_task()
+    # def on_key_down(self, window, key, scancode, codepoint, modifier):
+    #     if self.ids.new_task_title.focus and self.is_enter_key(key, modifier):
+    #         self.schedule_on_new_task()
 
     def is_enter_key(self, key, modifier):
         # Проверка кода клавиши Enter для разных платформ
